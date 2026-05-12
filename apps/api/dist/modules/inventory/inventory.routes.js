@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_middleware_1 = require("../../middlewares/auth.middleware");
+const inventory_controller_1 = require("./inventory.controller");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.authMiddleware);
+router.post("/movements", inventory_controller_1.InventoryController.createMovement);
+router.post("/purchase-entry", inventory_controller_1.InventoryController.createPurchaseEntry);
+router.get("/stock/:variantId", inventory_controller_1.InventoryController.getCurrentStock);
+router.get("/overview", inventory_controller_1.InventoryController.getOverview);
+exports.default = router;

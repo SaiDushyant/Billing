@@ -1,0 +1,15 @@
+{
+  "name": "electronics-erp",
+  "private": true,
+  "packageManager": "pnpm@11.0.8",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.5",
+    "typescript": "^5.8.3"
+  }
+}
