@@ -43,11 +43,41 @@ export class ProductsService {
     gstRate: number;
     sku: string;
     barcode: string;
+    openingStock?: number;
   }) {
-    return prisma.productVariant.create({
-      data: {
-        ...data,
-      },
+    const openingStock = data.openingStock || 0;
+
+    return prisma.$transaction(async (tx) => {
+      const variant = await tx.productVariant.create({
+        data: {
+          productId: data.productId,
+          displayName: data.displayName,
+          attributes: data.attributes,
+          costPrice: data.costPrice,
+          sellingPrice: data.sellingPrice,
+          gstRate: data.gstRate,
+          sku: data.sku,
+          barcode: data.barcode,
+
+          currentStock: openingStock,
+        },
+      });
+
+      if (openingStock > 0) {
+        await tx.stockMovement.create({
+          data: {
+            variantId: variant.id,
+
+            type: "PURCHASE",
+
+            quantity: openingStock,
+
+            notes: "Opening stock",
+          },
+        });
+      }
+
+      return variant;
     });
   }
 
@@ -58,7 +88,6 @@ export class ProductsService {
           {
             sku: {
               contains: search,
-
               mode: Prisma.QueryMode.insensitive,
             },
           },
@@ -72,7 +101,6 @@ export class ProductsService {
           {
             displayName: {
               contains: search,
-
               mode: Prisma.QueryMode.insensitive,
             },
           },
@@ -103,9 +131,7 @@ export class ProductsService {
 
   static async getVariants(options: {
     search?: string;
-
     page?: number;
-
     limit?: number;
   }) {
     const page = options.page || 1;
@@ -120,7 +146,6 @@ export class ProductsService {
             {
               displayName: {
                 contains: options.search,
-
                 mode: Prisma.QueryMode.insensitive,
               },
             },
@@ -128,7 +153,6 @@ export class ProductsService {
             {
               sku: {
                 contains: options.search,
-
                 mode: Prisma.QueryMode.insensitive,
               },
             },
@@ -187,17 +211,23 @@ export class ProductsService {
     for (const row of rows) {
       try {
         let category = await prisma.category.findFirst({
-          where: { name: row.categoryName },
+          where: {
+            name: row.categoryName,
+          },
         });
 
         if (!category) {
           category = await prisma.category.create({
-            data: { name: row.categoryName },
+            data: {
+              name: row.categoryName,
+            },
           });
         }
 
         let brand = await prisma.brand.findFirst({
-          where: { name: row.brandName },
+          where: {
+            name: row.brandName,
+          },
         });
 
         if (!brand) {
@@ -210,7 +240,9 @@ export class ProductsService {
         }
 
         let product = await prisma.product.findFirst({
-          where: { name: row.productName },
+          where: {
+            name: row.productName,
+          },
         });
 
         if (!product) {
@@ -222,10 +254,17 @@ export class ProductsService {
           });
         }
 
-        // DUPLICATE CHECK
         const existingVariant = await prisma.productVariant.findFirst({
           where: {
-            OR: [{ sku: row.sku }, { barcode: row.barcode }],
+            OR: [
+              {
+                sku: row.sku,
+              },
+
+              {
+                barcode: row.barcode,
+              },
+            ],
           },
         });
 
@@ -235,36 +274,51 @@ export class ProductsService {
             error: "SKU or barcode already exists",
             row,
           });
+
           continue;
         }
 
-        // CREATE VARIANT (NO currentStock HERE)
-        const variant = await prisma.productVariant.create({
-          data: {
-            productId: product.id,
-            displayName: row.displayName,
-            sku: row.sku,
-            barcode: row.barcode,
-            attributes: {},
-            costPrice: Number(row.costPrice),
-            sellingPrice: Number(row.sellingPrice),
-            gstRate: Number(row.gstRate),
-          },
-        });
-
-        // OPENING STOCK = STOCK MOVEMENT (ONLY SOURCE OF TRUTH)
         const qty = Number(row.quantity || 0);
 
-        if (qty > 0) {
-          await prisma.stockMovement.create({
+        const variant = await prisma.$transaction(async (tx) => {
+          const createdVariant = await tx.productVariant.create({
             data: {
-              variantId: variant.id,
-              type: "PURCHASE",
-              quantity: qty,
-              notes: "Opening stock import",
+              productId: product.id,
+
+              displayName: row.displayName,
+
+              sku: row.sku,
+
+              barcode: row.barcode,
+
+              attributes: {},
+
+              costPrice: Number(row.costPrice),
+
+              sellingPrice: Number(row.sellingPrice),
+
+              gstRate: Number(row.gstRate),
+
+              currentStock: qty,
             },
           });
-        }
+
+          if (qty > 0) {
+            await tx.stockMovement.create({
+              data: {
+                variantId: createdVariant.id,
+
+                type: "PURCHASE",
+
+                quantity: qty,
+
+                notes: "Opening stock import",
+              },
+            });
+          }
+
+          return createdVariant;
+        });
 
         results.push({
           success: true,

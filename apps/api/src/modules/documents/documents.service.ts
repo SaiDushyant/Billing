@@ -24,6 +24,7 @@ export class DocumentsService {
   }) {
     return prisma.$transaction(async (tx) => {
       let subtotal = 0;
+
       let gstTotal = 0;
 
       const processedItems = [];
@@ -40,7 +41,10 @@ export class DocumentsService {
         }
 
         if (data.type === "INVOICE" || data.type === "BILL") {
-          await InventoryService.validateStock(variant.id, item.quantity);
+          await InventoryService.validateStock(
+            variant.id,
+            item.quantity,
+          );
         }
 
         const unitPrice = Number(variant.sellingPrice);
@@ -111,11 +115,23 @@ export class DocumentsService {
 
               type: "SALE",
 
-              quantity: item.quantity,
+              quantity: -item.quantity,
 
               referenceId: document.id,
 
               notes: `${data.type} Sale`,
+            },
+          });
+
+          await tx.productVariant.update({
+            where: {
+              id: item.variant.id,
+            },
+
+            data: {
+              currentStock: {
+                decrement: item.quantity,
+              },
             },
           });
         }
@@ -171,7 +187,9 @@ export class DocumentsService {
     });
   }
 
-  static async convertQuotationToInvoice(quotationId: string) {
+  static async convertQuotationToInvoice(
+    quotationId: string,
+  ) {
     const quotation = await prisma.document.findUnique({
       where: {
         id: quotationId,

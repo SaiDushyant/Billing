@@ -30,7 +30,21 @@ export class AuthService {
       },
     });
 
-    return user;
+    // CREATE TOKEN AFTER REGISTER
+    const token = jwt.sign(
+      {
+        userId: user.id,
+      },
+      JWT_SECRET,
+      {
+        expiresIn: process.env.JWT_EXPIRES_IN as jwt.SignOptions["expiresIn"],
+      },
+    );
+
+    return {
+      user,
+      token,
+    };
   }
 
   static async login(email: string, password: string) {

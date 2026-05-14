@@ -7,7 +7,7 @@ export class AuthController {
     try {
       const validatedData = registerSchema.parse(req.body);
 
-      const user = await AuthService.register(
+      const result = await AuthService.register(
         validatedData.name,
         validatedData.email,
         validatedData.password,
@@ -15,7 +15,7 @@ export class AuthController {
 
       res.status(201).json({
         success: true,
-        user,
+        ...result,
       });
     } catch (error: any) {
       res.status(400).json({
