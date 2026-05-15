@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
+
 import jwt from "jsonwebtoken";
+
 import { prisma } from "../../config/prisma";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
@@ -30,11 +32,9 @@ export class AuthService {
       },
     });
 
-    // CREATE TOKEN AFTER REGISTER
     const token = jwt.sign(
       {
         userId: user.id,
-        role: user.role,
       },
       JWT_SECRET,
       {
@@ -68,7 +68,6 @@ export class AuthService {
     const token = jwt.sign(
       {
         userId: user.id,
-        role: user.role,
       },
       JWT_SECRET,
       {
@@ -80,5 +79,26 @@ export class AuthService {
       token,
       user,
     };
+  }
+
+  static async getCurrentUser(userId: string) {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+      },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    return user;
   }
 }

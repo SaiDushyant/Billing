@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
+
 import { AuthService } from "./auth.service";
+
 import { loginSchema, registerSchema } from "./auth.validation";
 
 export class AuthController {
@@ -42,6 +44,26 @@ export class AuthController {
       res.status(400).json({
         success: false,
         message: error.message,
+      });
+    }
+  }
+
+  static async me(req: Request, res: Response) {
+    try {
+      if (!req.user) {
+        return res.status(401).json({
+          success: false,
+          message: "Unauthorized",
+        });
+      }
+
+      const user = await AuthService.getCurrentUser(req.user.id);
+
+      res.json(user);
+    } catch (error: unknown) {
+      res.status(401).json({
+        success: false,
+        message: error instanceof Error ? error.message : "Unknown error",
       });
     }
   }

@@ -13,8 +13,6 @@ import inventoryRoutes from "./modules/inventory/inventory.routes";
 import documentsRoutes from "./modules/documents/documents.routes";
 import analyticsRoutes from "./modules/analytics/analytics.routes";
 
-import { authMiddleware } from "./middlewares/auth.middleware";
-
 dotenv.config();
 
 const app = express();
@@ -40,6 +38,7 @@ app.use(
     credentials: true,
   }),
 );
+
 app.use(express.json());
 
 app.get("/", (_, res) => {
@@ -49,16 +48,14 @@ app.get("/", (_, res) => {
 });
 
 app.use("/api/auth", authRoutes);
-app.use("/api/products", productRoutes);
-app.use("/api/inventory", inventoryRoutes);
-app.use("/api/documents", documentsRoutes);
-app.use("/api/analytics", analyticsRoutes);
 
-app.get("/api/me", authMiddleware, async (req, res) => {
-  res.json({
-    user: req.user,
-  });
-});
+app.use("/api/products", productRoutes);
+
+app.use("/api/inventory", inventoryRoutes);
+
+app.use("/api/documents", documentsRoutes);
+
+app.use("/api/analytics", analyticsRoutes);
 
 const PORT = process.env.PORT || 4000;
 
