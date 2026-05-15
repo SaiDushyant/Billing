@@ -101,6 +101,7 @@ export default function InventoryPage() {
       )}
 
       <EditVariantDialog
+        key={selectedVariant?.id}
         open={!!selectedVariant}
         onClose={() => setSelectedVariant(null)}
         variant={selectedVariant}

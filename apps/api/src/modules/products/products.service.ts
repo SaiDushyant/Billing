@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 
 import { prisma } from "../../config/prisma";
+import { calculateSellingPrice } from "../../utils/pricing";
 
 export class ProductsService {
   static async createCategory(name: string) {
@@ -15,6 +16,7 @@ export class ProductsService {
     return prisma.brand.create({
       data: {
         name,
+
         categoryId,
       },
     });
@@ -28,7 +30,9 @@ export class ProductsService {
     return prisma.product.create({
       data: {
         name,
+
         brandId,
+
         description,
       },
     });
@@ -36,13 +40,23 @@ export class ProductsService {
 
   static async createVariant(data: {
     productId: string;
+
     displayName: string;
+
     attributes: any;
+
     costPrice: number;
-    sellingPrice: number;
+
+    mrp: number;
+
+    profitMargin: number;
+
     gstRate: number;
+
     sku: string;
+
     barcode: string;
+
     openingStock?: number;
   }) {
     const openingStock = data.openingStock || 0;
@@ -51,12 +65,21 @@ export class ProductsService {
       const variant = await tx.productVariant.create({
         data: {
           productId: data.productId,
+
           displayName: data.displayName,
+
           attributes: data.attributes,
+
           costPrice: data.costPrice,
-          sellingPrice: data.sellingPrice,
+
+          mrp: data.mrp,
+
+          profitMargin: data.profitMargin,
+
           gstRate: data.gstRate,
+
           sku: data.sku,
+
           barcode: data.barcode,
 
           currentStock: openingStock,
@@ -82,12 +105,13 @@ export class ProductsService {
   }
 
   static async searchVariants(search: string) {
-    return prisma.productVariant.findMany({
+    const variants = await prisma.productVariant.findMany({
       where: {
         OR: [
           {
             sku: {
               contains: search,
+
               mode: Prisma.QueryMode.insensitive,
             },
           },
@@ -101,6 +125,7 @@ export class ProductsService {
           {
             displayName: {
               contains: search,
+
               mode: Prisma.QueryMode.insensitive,
             },
           },
@@ -117,6 +142,16 @@ export class ProductsService {
 
       take: 20,
     });
+
+    return variants.map((variant) => ({
+      ...variant,
+
+      sellingPrice: calculateSellingPrice(
+        Number(variant.costPrice),
+
+        Number(variant.profitMargin),
+      ),
+    }));
   }
 
   static async updateVariant(id: string, data: any) {
@@ -131,7 +166,9 @@ export class ProductsService {
 
   static async getVariants(options: {
     search?: string;
+
     page?: number;
+
     limit?: number;
   }) {
     const page = options.page || 1;
@@ -146,6 +183,7 @@ export class ProductsService {
             {
               displayName: {
                 contains: options.search,
+
                 mode: Prisma.QueryMode.insensitive,
               },
             },
@@ -153,6 +191,7 @@ export class ProductsService {
             {
               sku: {
                 contains: options.search,
+
                 mode: Prisma.QueryMode.insensitive,
               },
             },
@@ -234,6 +273,7 @@ export class ProductsService {
           brand = await prisma.brand.create({
             data: {
               name: row.brandName,
+
               categoryId: category.id,
             },
           });
@@ -249,6 +289,7 @@ export class ProductsService {
           product = await prisma.product.create({
             data: {
               name: row.productName,
+
               brandId: brand.id,
             },
           });
@@ -271,7 +312,9 @@ export class ProductsService {
         if (existingVariant) {
           results.push({
             success: false,
+
             error: "SKU or barcode already exists",
+
             row,
           });
 
@@ -295,7 +338,9 @@ export class ProductsService {
 
               costPrice: Number(row.costPrice),
 
-              sellingPrice: Number(row.sellingPrice),
+              mrp: Number(row.mrp),
+
+              profitMargin: Number(row.profitMargin),
 
               gstRate: Number(row.gstRate),
 
@@ -322,12 +367,15 @@ export class ProductsService {
 
         results.push({
           success: true,
+
           variant,
         });
       } catch (error: any) {
         results.push({
           success: false,
+
           error: error.message,
+
           row,
         });
       }

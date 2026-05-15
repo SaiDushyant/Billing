@@ -136,9 +136,19 @@ export default function POSPage() {
                 Barcode: {product.barcode}
               </p>
 
-              <p className="font-bold mt-2">
-                ₹{Number(product.sellingPrice).toFixed(2)}
-              </p>
+              <div className="mt-2 space-y-1">
+                <p className="font-bold">
+                  ₹{Number(product.sellingPrice).toFixed(2)}
+                </p>
+
+                <p className="text-sm text-muted-foreground">
+                  MRP: ₹{Number(product.mrp).toFixed(2)}
+                </p>
+
+                <p className="text-xs text-muted-foreground">
+                  GST: {product.gstRate}%
+                </p>
+              </div>
             </Card>
           ))}
         </div>

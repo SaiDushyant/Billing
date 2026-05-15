@@ -6,21 +6,43 @@ import { authMiddleware } from "../../middlewares/auth.middleware";
 
 import { upload } from "../../middlewares/upload.middleware";
 
+import { requireRole } from "../../middlewares/rbac.middleware";
+
 const router = Router();
 
 router.use(authMiddleware);
 
-router.post("/categories", ProductsController.createCategory);
+router.post(
+  "/categories",
+  requireRole(["ADMIN", "INVENTORY_MANAGER"]),
+  ProductsController.createCategory,
+);
 
-router.post("/brands", ProductsController.createBrand);
+router.post(
+  "/brands",
+  requireRole(["ADMIN", "INVENTORY_MANAGER"]),
+  ProductsController.createBrand,
+);
 
-router.post("/products", ProductsController.createProduct);
+router.post(
+  "/products",
+  requireRole(["ADMIN", "INVENTORY_MANAGER"]),
+  ProductsController.createProduct,
+);
 
-router.post("/variants", ProductsController.createVariant);
+router.post(
+  "/variants",
+  requireRole(["ADMIN", "INVENTORY_MANAGER"]),
+  ProductsController.createVariant,
+);
 
 router.get("/variants/search", ProductsController.searchVariants);
 
-router.patch("/variants/:id", ProductsController.updateVariant);
+router.patch(
+  "/variants/:id",
+  requireRole(["ADMIN", "INVENTORY_MANAGER"]),
+  ProductsController.updateVariant,
+);
 
 router.get("/variants", ProductsController.getVariants);
 

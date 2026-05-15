@@ -5,6 +5,7 @@ import { prisma } from "../../config/prisma";
 import { InventoryService } from "../inventory/inventory.service";
 
 import { calculateGSTAmount } from "./documents.utils";
+import { calculateSellingPrice } from "../../utils/pricing";
 
 export class DocumentsService {
   static async createDocument(data: {
@@ -41,13 +42,13 @@ export class DocumentsService {
         }
 
         if (data.type === "INVOICE" || data.type === "BILL") {
-          await InventoryService.validateStock(
-            variant.id,
-            item.quantity,
-          );
+          await InventoryService.validateStock(variant.id, item.quantity);
         }
 
-        const unitPrice = Number(variant.sellingPrice);
+        const unitPrice = calculateSellingPrice(
+          Number(variant.costPrice),
+          Number(variant.profitMargin),
+        );
 
         const lineAmount = unitPrice * item.quantity;
 
@@ -115,7 +116,7 @@ export class DocumentsService {
 
               type: "SALE",
 
-              quantity: -item.quantity,
+              quantity: item.quantity,
 
               referenceId: document.id,
 
@@ -187,9 +188,7 @@ export class DocumentsService {
     });
   }
 
-  static async convertQuotationToInvoice(
-    quotationId: string,
-  ) {
+  static async convertQuotationToInvoice(quotationId: string) {
     const quotation = await prisma.document.findUnique({
       where: {
         id: quotationId,

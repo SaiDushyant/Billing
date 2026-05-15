@@ -16,6 +16,8 @@ function Layout() {
 
   const logout = useAuthStore((s) => s.logout);
 
+  const user = useAuthStore((s) => s.user);
+
   function handleLogout() {
     logout();
 
@@ -27,15 +29,21 @@ function Layout() {
       <div className="h-14 border-b bg-white flex items-center gap-4 px-4">
         <Link to="/">POS</Link>
 
-        <Link to="/dashboard">Dashboard</Link>
+        {["ADMIN", "ACCOUNTANT"].includes(user?.role || "") && (
+          <Link to="/dashboard">Dashboard</Link>
+        )}
 
-        <Link to="/inventory">Inventory</Link>
+        {["ADMIN", "INVENTORY_MANAGER"].includes(user?.role || "") && (
+          <Link to="/inventory">Inventory</Link>
+        )}
 
         <Link to="/barcode">Barcode</Link>
 
-        <button className="ml-auto" onClick={handleLogout}>
-          Logout
-        </button>
+        <div className="ml-auto flex items-center gap-4">
+          <span className="text-sm text-gray-500">{user?.name}</span>
+
+          <button onClick={handleLogout}>Logout</button>
+        </div>
       </div>
 
       <Outlet />

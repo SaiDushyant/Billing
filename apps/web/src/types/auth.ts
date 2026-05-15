@@ -1,15 +1,13 @@
+export type UserRole = "ADMIN" | "CASHIER" | "INVENTORY_MANAGER" | "ACCOUNTANT";
+
 export interface User {
   id: string;
 
   name: string;
 
   email: string;
-}
 
-export interface AuthData {
-  token: string;
-
-  user: User;
+  role: UserRole;
 }
 
 export interface AuthResponse {

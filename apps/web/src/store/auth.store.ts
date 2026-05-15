@@ -7,64 +7,40 @@ interface AuthStore {
 
   token: string | null;
 
-  setAuth: (
-    user: User,
-    token: string
-  ) => void;
+  setAuth: (user: User, token: string) => void;
+
+  setUser: (user: User | null) => void;
 
   logout: () => void;
 }
 
-export const useAuthStore =
-  create<AuthStore>((set) => ({
-    user: localStorage.getItem(
-      "user"
-    )
-      ? JSON.parse(
-          localStorage.getItem(
-            "user"
-          ) as string
-        )
-      : null,
+export const useAuthStore = create<AuthStore>((set) => ({
+  user: null,
 
-    token:
-      localStorage.getItem(
-        "token"
-      ),
+  token: localStorage.getItem("token"),
 
-    setAuth: (
+  setAuth: (user, token) => {
+    localStorage.setItem("token", token);
+
+    set({
       user,
-      token
-    ) => {
-      localStorage.setItem(
-        "token",
-        token
-      );
+      token,
+    });
+  },
 
-      localStorage.setItem(
-        "user",
-        JSON.stringify(user)
-      );
+  setUser: (user) => {
+    set({
+      user,
+    });
+  },
 
-      set({
-        user,
-        token,
-      });
-    },
+  logout: () => {
+    localStorage.removeItem("token");
 
-    logout: () => {
-      localStorage.removeItem(
-        "token"
-      );
+    set({
+      user: null,
 
-      localStorage.removeItem(
-        "user"
-      );
-
-      set({
-        user: null,
-
-        token: null,
-      });
-    },
-  }));
+      token: null,
+    });
+  },
+}));

@@ -15,7 +15,9 @@ export const importRowSchema = z.object({
 
   costPrice: z.coerce.number(),
 
-  sellingPrice: z.coerce.number(),
+  mrp: z.coerce.number(),
+
+  profitMargin: z.coerce.number(),
 
   gstRate: z.coerce.number(),
 

@@ -30,21 +30,15 @@ interface Props {
 export default function EditVariantDialog({ open, onClose, variant }: Props) {
   const queryClient = useQueryClient();
 
-  const [sellingPrice, setSellingPrice] = useState("");
+  const [costPrice, setCostPrice] = useState(
+    variant ? String(variant.costPrice) : "",
+  );
 
-  const [costPrice, setCostPrice] = useState("");
+  const [mrp, setMrp] = useState(variant ? String(variant.mrp) : "");
 
-  const handleOpenChange = (value: boolean) => {
-    if (value && variant) {
-      setSellingPrice(String(variant.sellingPrice));
-
-      setCostPrice(String(variant.costPrice));
-    }
-
-    if (!value) {
-      onClose();
-    }
-  };
+  const [profitMargin, setProfitMargin] = useState(
+    variant ? String(variant.profitMargin) : "",
+  );
 
   const updateMutation = useMutation({
     mutationFn: async () => {
@@ -53,9 +47,11 @@ export default function EditVariantDialog({ open, onClose, variant }: Props) {
       }
 
       await api.patch(`/products/variants/${variant.id}`, {
-        sellingPrice: Number(sellingPrice),
-
         costPrice: Number(costPrice),
+
+        mrp: Number(mrp),
+
+        profitMargin: Number(profitMargin),
       });
     },
 
@@ -69,7 +65,7 @@ export default function EditVariantDialog({ open, onClose, variant }: Props) {
   });
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Edit Variant</DialogTitle>
@@ -77,24 +73,32 @@ export default function EditVariantDialog({ open, onClose, variant }: Props) {
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>Selling Price</Label>
-
-            <Input
-              type="number"
-              value={sellingPrice}
-              onChange={(e) => setSellingPrice(e.target.value)}
-              placeholder="Selling Price"
-            />
-          </div>
-
-          <div className="space-y-2">
             <Label>Cost Price</Label>
 
             <Input
               type="number"
               value={costPrice}
               onChange={(e) => setCostPrice(e.target.value)}
-              placeholder="Cost Price"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>MRP</Label>
+
+            <Input
+              type="number"
+              value={mrp}
+              onChange={(e) => setMrp(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Profit Margin %</Label>
+
+            <Input
+              type="number"
+              value={profitMargin}
+              onChange={(e) => setProfitMargin(e.target.value)}
             />
           </div>
 

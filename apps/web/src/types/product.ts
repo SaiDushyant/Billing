@@ -7,7 +7,14 @@ export interface ProductVariant {
 
   barcode: string;
 
-  sellingPrice: string;
+  costPrice: string;
+
+  mrp: string;
+
+  profitMargin: string;
+
+  // Computed dynamically
+  sellingPrice: number;
 
   gstRate: string;
 

@@ -1,0 +1,72 @@
+categoryName,brandName,productName,displayName,sku,barcode,costPrice,mrp,profitMargin,gstRate,quantity
+MCB,L&T,Tripper MCB,Tripper MCB 6A SP,LNT-TRP-6A-SP,8901234500080,118,152,29,18,42
+MCB,L&T,Tripper MCB,Tripper MCB 16A SP,LNT-TRP-16A-SP,8901234500081,132,172,30,18,38
+MCB,Siemens,Sentron MCB,Sentron 20A SP,SMS-SNT-20A,8901234500082,145,188,30,18,36
+MCB,Siemens,Sentron MCB,Sentron 32A DP,SMS-SNT-32A,8901234500083,265,340,28,18,28
+RCCB,L&T,Safe RCCB,Safe RCCB 40A 30mA,LNT-RCCB-40A,8901234500084,1180,1520,29,18,15
+RCCB,Siemens,Sentron RCCB,Sentron RCCB 63A,SMS-RCCB-63A,8901234500085,1520,1920,26,18,10
+ELCB,Havells,ELCB,ELCB 40A,HVL-ELCB-40A,8901234500086,980,1320,35,18,14
+Switches,Panasonic,Modular Switch,Panasonic 6A 1 Way,PAN-SW-6A,8901234500087,58,92,58,18,95
+Switches,Panasonic,Modular Switch,Panasonic Bell Push,PAN-SW-BELL,8901234500088,88,128,45,18,65
+Switches,Crabtree,Classic Switch,Classic 16A Switch,CRB-16A-SW,8901234500089,78,118,51,18,72
+Sockets,Panasonic,Modular Socket,Panasonic 6A Socket,PAN-SKT-6A,8901234500090,62,98,58,18,82
+Sockets,Crabtree,Classic Socket,Classic 16A Socket,CRB-SKT-16A,8901234500091,118,178,51,18,50
+Wire,KEI,House Wire,1 Sqmm White,KEI-1-WHT,8901234500092,670,870,30,18,24
+Wire,KEI,House Wire,2.5 Sqmm Green,KEI-2.5-GRN,8901234500093,1520,1840,21,18,19
+Wire,Universal,FRLS Wire,1.5 Sqmm Yellow,UNI-1.5-YLW,8901234500094,860,1080,26,18,26
+Lighting,Bajaj,LED Bulb,7W Cool White,BJJ-7W-CW,8901234500095,48,82,71,12,140
+Lighting,Bajaj,LED Flood Light,30W Flood Light,BJJ-30W-FLD,8901234500096,620,890,44,18,22
+Lighting,Crompton,LED Panel,12W Slim Panel,CRP-12W-PNL,8901234500097,280,420,50,18,30
+Fan,Bajaj,Ceiling Fan,1200mm Deco White,BJJ-FAN-WHT,8901234500098,1750,2350,34,18,16
+Fan,Orient,Ceiling Fan,1200mm Energy Saver,ORI-ES-1200,8901234500099,2250,2890,28,18,9
+Distribution Board,L&T,DB Box,12 Way SPN,LNT-DB-12W,8901234500100,1450,1820,25,18,8
+Distribution Board,Siemens,DB Box,4 Way TPN,SMS-DB-4W,8901234500101,1180,1540,31,18,11
+Conduit,AKG,Flexible Conduit,25mm Flex Pipe,AKG-FLX-25,8901234500102,145,205,41,18,140
+Conduit,Precision,Flexible Conduit,20mm Flex Pipe,PRE-FLX-20,8901234500103,118,175,48,18,165
+Indicator,Salzer,LED Indicator,Blue Indicator,SLZ-BLU,8901234500104,28,48,71,18,210
+Indicator,Salzer,LED Indicator,White Indicator,SLZ-WHT,8901234500105,30,52,73,18,190
+Modular Plate,Panasonic,Modular Plate,4 Module Plate,PAN-PLT-4M,8901234500106,35,58,66,18,120
+Modular Plate,Crabtree,Classic Plate,12 Module Plate,CRB-PLT-12M,8901234500107,68,102,50,18,70
+Sensor,Honeywell,Occupancy Sensor,Ceiling Occupancy Sensor,HNW-OCC-SNS,8901234500108,1250,1680,34,18,14
+Sensor,CP Plus,Smoke Sensor,Photoelectric Smoke Sensor,CPP-SMK-SNS,8901234500109,1480,1980,34,18,12
+Exhaust Fan,Usha,Exhaust Fan,10 Inch Ventilation Fan,USH-EXH-10,8901234500110,1580,2120,34,18,11
+Cable Accessories,Dowells,Cable Tie,Nylon Cable Tie 100mm,DWL-TIE-100,8901234500111,45,78,73,18,600
+Cable Accessories,Jainson,Copper Lug,Copper Lug 70 Sqmm,JNS-LUG-70,8901234500112,26,42,62,18,380
+PVC Pipe,Ajay,PVC Pipe,2 Inch PVC Pipe,AJY-PVC-2,8901234500113,220,310,41,18,75
+PVC Pipe,Supreme,PVC Pipe,1.25 Inch PVC Pipe,SPR-PVC-1.25,8901234500114,125,188,50,18,105
+Lighting,Philips,Street Light,40W LED Street Light,PHL-ST-40W,8901234500115,1850,2450,32,18,18
+Fan,Crompton,Wall Fan,400mm Wall Fan,CRP-WF-400,8901234500116,2450,3180,30,18,7
+Switches,Anchor,Roma Plus Switch,Roma Plus 32A Switch,ANC-RP-32A,8901234500117,145,210,45,18,44
+Sockets,GM,Four Five Socket,GM USB Charging Socket,GM-USB-SKT,8901234500118,185,275,49,18,36
+Wire,Polycab,FRLSH Wire,4 Sqmm Black,PLY-4-BLK,8901234500119,2450,2950,20,18,15
+MCB,Hager,Hager MCB,Hager 25A SP,HGR-25A-SP,8901234500120,168,220,31,18,31
+MCB,Hager,Hager MCB,Hager 40A DP,HGR-40A-DP,8901234500121,295,380,29,18,24
+MCB,ABB,System Pro MCB,System Pro 10A SP,ABB-SP-10A,8901234500122,138,182,32,18,40
+MCB,ABB,System Pro MCB,System Pro 20A SP,ABB-SP-20A,8901234500123,152,198,30,18,34
+RCCB,ABB,System Pro RCCB,System Pro RCCB 40A,ABB-RCCB-40A,8901234500124,1320,1720,30,18,13
+Switches,Legrand,Arteor Switch,Arteor 6A Switch,LGR-ART-6A,8901234500125,88,132,50,18,78
+Switches,Legrand,Arteor Switch,Arteor Bell Push,LGR-ART-BELL,8901234500126,110,168,53,18,52
+Sockets,Legrand,Arteor Socket,Arteor 16A Socket,LGR-ART-SKT16,8901234500127,145,220,52,18,45
+Lighting,Wipro,LED Downlight,15W Downlight,WPR-DL-15W,8901234500128,320,480,50,18,38
+Lighting,Havells,LED Flood Light,50W Flood Light,HVL-FLD-50W,8901234500129,1450,1980,37,18,20
+Lighting,Syska,LED Strip,5 Meter LED Strip,SYS-STRIP-5M,8901234500130,520,780,50,18,26
+Fan,Orient,Wall Fan,400mm Wall Fan,ORI-WF-400,8901234500131,2350,3050,30,18,8
+Fan,Usha,Table Fan,400mm Table Fan,USH-TF-400,8901234500132,1650,2250,36,18,12
+Wire,Finolex,Industrial Cable,6 Sqmm Copper Cable,FNX-6-CBL,8901234500133,3650,4450,22,18,10
+Wire,RR Kabel,FRLS Wire,2.5 Sqmm White,RR-2.5-WHT,8901234500134,1480,1820,23,18,18
+Conduit,AKG,PVC Conduit,32mm Heavy Pipe,AKG-32MM,8901234500135,185,260,41,18,130
+Conduit,Precision,PVC Conduit,32mm Flex Pipe,PRE-FLX-32,8901234500136,210,295,40,18,120
+Indicator,HPL,LED Indicator,Blue Indicator,HPL-BLU,8901234500137,28,48,71,18,200
+Indicator,Salzer,Buzzer Indicator,Panel Buzzer 24V,SLZ-BUZ-24V,8901234500138,95,145,53,18,85
+Cable Accessories,Dowells,Cable Gland,Brass Cable Gland 32mm,DWL-GLD-32,8901234500139,42,68,62,18,260
+Cable Accessories,Jainson,Copper Lug,Copper Lug 95 Sqmm,JNS-LUG-95,8901234500140,38,62,63,18,320
+PVC Pipe,Prince,PVC Pipe,2 Inch PVC Pipe,PRC-PVC-2,8901234500141,225,325,44,18,70
+PVC Pipe,Supreme,CPVC Pipe,1 Inch CPVC Pipe,SPR-CPVC-1,8901234500142,165,245,48,18,92
+Sensor,Honeywell,Smoke Sensor,Wireless Smoke Sensor,HNW-WSMK,8901234500143,1850,2450,32,18,10
+Sensor,CP Plus,Motion Sensor,Outdoor Motion Sensor,CPP-MTN-OUT,8901234500144,1450,1980,36,18,14
+Distribution Board,Havells,Metal DB Box,16 Way TPN,HVL-DB-16W,8901234500145,2850,3650,28,18,6
+Distribution Board,Legrand,Metal DB Box,12 Way TPN,LGR-DB-12W-TPN,8901234500146,2650,3480,31,18,7
+Exhaust Fan,Crompton,Industrial Exhaust Fan,15 Inch Industrial Fan,CRP-IND-15,8901234500147,3650,4650,27,18,5
+Exhaust Fan,Havells,Fresh Air Fan,Fresh Air Ventilation Fan,HVL-FRESH-AIR,8901234500148,2850,3750,32,18,8
+Lighting,Philips,Smart Bulb,12W WiFi Smart Bulb,PHL-SMART-12W,8901234500149,650,980,51,18,30
+Lighting,Wipro,Emergency Light,Rechargeable Emergency Light,WPR-EMG-LGT,8901234500150,850,1280,50,18,24

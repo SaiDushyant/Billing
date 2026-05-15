@@ -11,7 +11,12 @@ export interface InventoryVariant {
 
   costPrice: string;
 
-  sellingPrice: string;
+  mrp: string;
+
+  profitMargin: string;
+
+  // Computed from backend
+  sellingPrice: number;
 
   gstRate: string;
 

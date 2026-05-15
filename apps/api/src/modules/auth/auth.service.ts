@@ -34,6 +34,7 @@ export class AuthService {
     const token = jwt.sign(
       {
         userId: user.id,
+        role: user.role,
       },
       JWT_SECRET,
       {
@@ -67,6 +68,7 @@ export class AuthService {
     const token = jwt.sign(
       {
         userId: user.id,
+        role: user.role,
       },
       JWT_SECRET,
       {
