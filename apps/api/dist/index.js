@@ -15,7 +15,7 @@ const products_routes_1 = __importDefault(require("./modules/products/products.r
 const inventory_routes_1 = __importDefault(require("./modules/inventory/inventory.routes"));
 const documents_routes_1 = __importDefault(require("./modules/documents/documents.routes"));
 const analytics_routes_1 = __importDefault(require("./modules/analytics/analytics.routes"));
-const auth_middleware_1 = require("./middlewares/auth.middleware");
+const audit_routes_1 = __importDefault(require("./modules/audit/audit.routes"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use((0, helmet_1.default)());
@@ -41,11 +41,7 @@ app.use("/api/products", products_routes_1.default);
 app.use("/api/inventory", inventory_routes_1.default);
 app.use("/api/documents", documents_routes_1.default);
 app.use("/api/analytics", analytics_routes_1.default);
-app.get("/api/me", auth_middleware_1.authMiddleware, async (req, res) => {
-    res.json({
-        user: req.user,
-    });
-});
+app.use("/api/audit", audit_routes_1.default);
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
     console.log(`API running on port ${PORT}`);

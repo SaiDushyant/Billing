@@ -7,10 +7,10 @@ class AuthController {
     static async register(req, res) {
         try {
             const validatedData = auth_validation_1.registerSchema.parse(req.body);
-            const user = await auth_service_1.AuthService.register(validatedData.name, validatedData.email, validatedData.password);
+            const result = await auth_service_1.AuthService.register(validatedData.name, validatedData.email, validatedData.password);
             res.status(201).json({
                 success: true,
-                user,
+                ...result,
             });
         }
         catch (error) {
@@ -33,6 +33,24 @@ class AuthController {
             res.status(400).json({
                 success: false,
                 message: error.message,
+            });
+        }
+    }
+    static async me(req, res) {
+        try {
+            if (!req.user) {
+                return res.status(401).json({
+                    success: false,
+                    message: "Unauthorized",
+                });
+            }
+            const user = await auth_service_1.AuthService.getCurrentUser(req.user.id);
+            res.json(user);
+        }
+        catch (error) {
+            res.status(401).json({
+                success: false,
+                message: error instanceof Error ? error.message : "Unknown error",
             });
         }
     }

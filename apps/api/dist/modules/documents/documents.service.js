@@ -5,8 +5,10 @@ const client_1 = require("@prisma/client");
 const prisma_1 = require("../../config/prisma");
 const inventory_service_1 = require("../inventory/inventory.service");
 const documents_utils_1 = require("./documents.utils");
+const pricing_1 = require("../../utils/pricing");
+const audit_service_1 = require("../audit/audit.service");
 class DocumentsService {
-    static async createDocument(data) {
+    static async createDocument(data, userId) {
         return prisma_1.prisma.$transaction(async (tx) => {
             let subtotal = 0;
             let gstTotal = 0;
@@ -23,7 +25,7 @@ class DocumentsService {
                 if (data.type === "INVOICE" || data.type === "BILL") {
                     await inventory_service_1.InventoryService.validateStock(variant.id, item.quantity);
                 }
-                const unitPrice = Number(variant.sellingPrice);
+                const unitPrice = (0, pricing_1.calculateSellingPrice)(Number(variant.costPrice), Number(variant.profitMargin));
                 const lineAmount = unitPrice * item.quantity;
                 const gstAmount = (0, documents_utils_1.calculateGSTAmount)(lineAmount, Number(variant.gstRate));
                 subtotal += lineAmount;
@@ -68,6 +70,16 @@ class DocumentsService {
                             notes: `${data.type} Sale`,
                         },
                     });
+                    await tx.productVariant.update({
+                        where: {
+                            id: item.variant.id,
+                        },
+                        data: {
+                            currentStock: {
+                                decrement: item.quantity,
+                            },
+                        },
+                    });
                 }
             }
             if (data.payment) {
@@ -79,7 +91,157 @@ class DocumentsService {
                     },
                 });
             }
+            // AUDIT LOG
+            await audit_service_1.AuditService.log({
+                userId,
+                action: "SALE",
+                entityType: "DOCUMENT",
+                entityId: document.id,
+                newData: {
+                    type: document.type,
+                    total: document.grandTotal,
+                },
+            });
             return document;
+        });
+    }
+    static async cancelDocument(documentId, userId) {
+        return prisma_1.prisma.$transaction(async (tx) => {
+            const document = await tx.document.findUnique({
+                where: {
+                    id: documentId,
+                },
+                include: {
+                    items: true,
+                },
+            });
+            if (!document) {
+                throw new Error("Document not found");
+            }
+            if (document.status === "CANCELLED") {
+                throw new Error("Already cancelled");
+            }
+            for (const item of document.items) {
+                // STOCK REVERSAL ENTRY
+                await tx.stockMovement.create({
+                    data: {
+                        variantId: item.variantId,
+                        type: "RETURN",
+                        quantity: item.quantity,
+                        referenceId: document.id,
+                        notes: "Invoice cancellation stock reversal",
+                    },
+                });
+                // RESTORE STOCK
+                await tx.productVariant.update({
+                    where: {
+                        id: item.variantId,
+                    },
+                    data: {
+                        currentStock: {
+                            increment: item.quantity,
+                        },
+                    },
+                });
+            }
+            const updatedDocument = await tx.document.update({
+                where: {
+                    id: document.id,
+                },
+                data: {
+                    status: "CANCELLED",
+                },
+            });
+            // MARK PAYMENTS REFUNDED
+            await tx.payment.updateMany({
+                where: {
+                    documentId: document.id,
+                },
+                data: {
+                    isRefunded: true,
+                },
+            });
+            // AUDIT LOG
+            await audit_service_1.AuditService.log({
+                userId,
+                action: "CANCEL",
+                entityType: "DOCUMENT",
+                entityId: document.id,
+                metadata: {
+                    status: "CANCELLED",
+                },
+            });
+            return updatedDocument;
+        });
+    }
+    static async returnDocument(documentId, reason, userId) {
+        return prisma_1.prisma.$transaction(async (tx) => {
+            const document = await tx.document.findUnique({
+                where: {
+                    id: documentId,
+                },
+                include: {
+                    items: true,
+                },
+            });
+            if (!document) {
+                throw new Error("Document not found");
+            }
+            if (document.status === "RETURNED") {
+                throw new Error("Already returned");
+            }
+            for (const item of document.items) {
+                // CREATE RETURN STOCK ENTRY
+                await tx.stockMovement.create({
+                    data: {
+                        variantId: item.variantId,
+                        type: "RETURN",
+                        quantity: item.quantity,
+                        referenceId: document.id,
+                        notes: `Returned Invoice: ${reason}`,
+                    },
+                });
+                // RESTORE STOCK
+                await tx.productVariant.update({
+                    where: {
+                        id: item.variantId,
+                    },
+                    data: {
+                        currentStock: {
+                            increment: item.quantity,
+                        },
+                    },
+                });
+            }
+            const updatedDocument = await tx.document.update({
+                where: {
+                    id: document.id,
+                },
+                data: {
+                    status: "RETURNED",
+                },
+            });
+            // MARK PAYMENTS REFUNDED
+            await tx.payment.updateMany({
+                where: {
+                    documentId: document.id,
+                },
+                data: {
+                    isRefunded: true,
+                },
+            });
+            // AUDIT LOG
+            await audit_service_1.AuditService.log({
+                userId,
+                action: "UPDATE",
+                entityType: "DOCUMENT_RETURN",
+                entityId: document.id,
+                metadata: {
+                    status: "RETURNED",
+                    reason,
+                },
+            });
+            return updatedDocument;
         });
     }
     static async getDocumentById(id) {
