@@ -9,6 +9,7 @@ import { api } from "@/lib/api";
 import { useAuthStore } from "@/store/auth.store";
 
 import type { AuthResponse } from "@/types/auth";
+import { toast } from "sonner";
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -38,12 +39,18 @@ export default function SignupPage() {
       const axiosError = error as {
         response?: {
           data?: {
-            message?: string;
+            message?: string | { message: string }[];
           };
         };
       };
 
-      alert(axiosError.response?.data?.message || "Signup failed");
+      const backendMessage = axiosError.response?.data?.message;
+
+      if (Array.isArray(backendMessage)) {
+        toast.error(backendMessage.map((err) => err.message).join(", "));
+      } else {
+        toast.error(backendMessage || "Signup failed");
+      }
     }
   }
 

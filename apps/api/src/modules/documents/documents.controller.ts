@@ -15,7 +15,6 @@ export class DocumentsController {
 
       const document = await DocumentsService.createDocument(
         validated,
-
         req.user?.id,
       );
 
@@ -58,6 +57,37 @@ export class DocumentsController {
       );
 
       res.json(invoice);
+    } catch (error: any) {
+      res.status(400).json({
+        message: error.message,
+      });
+    }
+  }
+
+  static async cancelDocument(req: Request<Params>, res: Response) {
+    try {
+      const result = await DocumentsService.cancelDocument(
+        req.params.id,
+        req.user?.id,
+      );
+
+      res.json(result);
+    } catch (error: any) {
+      res.status(400).json({
+        message: error.message,
+      });
+    }
+  }
+
+  static async returnDocument(req: Request<Params>, res: Response) {
+    try {
+      const result = await DocumentsService.returnDocument(
+        req.params.id,
+        req.body.reason,
+        req.user?.id,
+      );
+
+      res.json(result);
     } catch (error: any) {
       res.status(400).json({
         message: error.message,

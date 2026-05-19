@@ -49,6 +49,7 @@ enum AuditAction {
   IMPORT
   SALE
   PURCHASE
+  RETURN
 }
 
 model User {

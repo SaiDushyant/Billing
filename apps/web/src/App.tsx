@@ -7,10 +7,13 @@ import BarcodePage from "./pages/BarcodePage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import AuditPage from "./pages/AuditPage";
+import DocumentsPage from "./pages/DocumentsPage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import { useAuthStore } from "./store/auth.store";
+
+import { Toaster } from "sonner";
 
 function Layout() {
   const navigate = useNavigate();
@@ -38,6 +41,8 @@ function Layout() {
           <Link to="/inventory">Inventory</Link>
         )}
 
+        <Link to="/documents">Documents</Link>
+
         {user?.role === "ADMIN" && <Link to="/audit">Audit</Link>}
 
         <Link to="/barcode">Barcode</Link>
@@ -56,28 +61,33 @@ function Layout() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
+    <>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
 
-      <Route path="/signup" element={<SignupPage />} />
+        <Route path="/signup" element={<SignupPage />} />
 
-      <Route
-        element={
-          <ProtectedRoute>
-            <Layout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="/" element={<POSPage />} />
+        <Route
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/" element={<POSPage />} />
 
-        <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
 
-        <Route path="/inventory" element={<InventoryPage />} />
+          <Route path="/inventory" element={<InventoryPage />} />
 
-        <Route path="/audit" element={<AuditPage />} />
+          <Route path="/documents" element={<DocumentsPage />} />
 
-        <Route path="/barcode" element={<BarcodePage />} />
-      </Route>
-    </Routes>
+          <Route path="/audit" element={<AuditPage />} />
+
+          <Route path="/barcode" element={<BarcodePage />} />
+        </Route>
+      </Routes>
+      <Toaster />
+    </>
   );
 }

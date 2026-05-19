@@ -178,6 +178,192 @@ export class DocumentsService {
     });
   }
 
+  static async cancelDocument(documentId: string, userId?: string) {
+    return prisma.$transaction(async (tx) => {
+      const document = await tx.document.findUnique({
+        where: {
+          id: documentId,
+        },
+
+        include: {
+          items: true,
+        },
+      });
+
+      if (!document) {
+        throw new Error("Document not found");
+      }
+
+      if (document.status === "CANCELLED") {
+        throw new Error("Already cancelled");
+      }
+
+      for (const item of document.items) {
+        // STOCK REVERSAL ENTRY
+        await tx.stockMovement.create({
+          data: {
+            variantId: item.variantId,
+
+            type: "RETURN",
+
+            quantity: item.quantity,
+
+            referenceId: document.id,
+
+            notes: "Invoice cancellation stock reversal",
+          },
+        });
+
+        // RESTORE STOCK
+        await tx.productVariant.update({
+          where: {
+            id: item.variantId,
+          },
+
+          data: {
+            currentStock: {
+              increment: item.quantity,
+            },
+          },
+        });
+      }
+
+      const updatedDocument = await tx.document.update({
+        where: {
+          id: document.id,
+        },
+
+        data: {
+          status: "CANCELLED",
+        },
+      });
+
+      // MARK PAYMENTS REFUNDED
+      await tx.payment.updateMany({
+        where: {
+          documentId: document.id,
+        },
+
+        data: {
+          isRefunded: true,
+        },
+      });
+
+      // AUDIT LOG
+      await AuditService.log({
+        userId,
+
+        action: "CANCEL",
+
+        entityType: "DOCUMENT",
+
+        entityId: document.id,
+
+        metadata: {
+          status: "CANCELLED",
+        },
+      });
+
+      return updatedDocument;
+    });
+  }
+
+  static async returnDocument(
+    documentId: string,
+    reason: string,
+    userId?: string,
+  ) {
+    return prisma.$transaction(async (tx) => {
+      const document = await tx.document.findUnique({
+        where: {
+          id: documentId,
+        },
+
+        include: {
+          items: true,
+        },
+      });
+
+      if (!document) {
+        throw new Error("Document not found");
+      }
+
+      if (document.status === "RETURNED") {
+        throw new Error("Already returned");
+      }
+
+      for (const item of document.items) {
+        // CREATE RETURN STOCK ENTRY
+        await tx.stockMovement.create({
+          data: {
+            variantId: item.variantId,
+
+            type: "RETURN",
+
+            quantity: item.quantity,
+
+            referenceId: document.id,
+
+            notes: `Returned Invoice: ${reason}`,
+          },
+        });
+
+        // RESTORE STOCK
+        await tx.productVariant.update({
+          where: {
+            id: item.variantId,
+          },
+
+          data: {
+            currentStock: {
+              increment: item.quantity,
+            },
+          },
+        });
+      }
+
+      const updatedDocument = await tx.document.update({
+        where: {
+          id: document.id,
+        },
+
+        data: {
+          status: "RETURNED",
+        },
+      });
+
+      // MARK PAYMENTS REFUNDED
+      await tx.payment.updateMany({
+        where: {
+          documentId: document.id,
+        },
+
+        data: {
+          isRefunded: true,
+        },
+      });
+
+      // AUDIT LOG
+      await AuditService.log({
+        userId,
+
+        action: "UPDATE",
+
+        entityType: "DOCUMENT_RETURN",
+
+        entityId: document.id,
+
+        metadata: {
+          status: "RETURNED",
+
+          reason,
+        },
+      });
+
+      return updatedDocument;
+    });
+  }
+
   static async getDocumentById(id: string) {
     return prisma.document.findUnique({
       where: {

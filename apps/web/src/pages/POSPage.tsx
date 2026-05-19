@@ -10,6 +10,7 @@ import { useProductSearch } from "@/features/pos/useProductSearch";
 import { api } from "@/lib/api";
 
 import { generateInvoicePDF } from "@/utils/generateInvoicePDF";
+import { toast } from "sonner";
 
 export default function POSPage() {
   const [search, setSearch] = useState("");
@@ -73,13 +74,13 @@ export default function POSPage() {
         grandTotal,
       });
 
-      alert("Bill Created");
+      toast.success("Bill Created");
 
       clearCart();
     } catch (error) {
       console.error(error);
 
-      alert("Checkout failed");
+      toast.error("Checkout failed");
     }
   }
 

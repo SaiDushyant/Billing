@@ -8,6 +8,7 @@ import { api } from "@/lib/api";
 import { useAuthStore } from "@/store/auth.store";
 
 import type { AuthResponse } from "@/types/auth";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ export default function LoginPage() {
 
       navigate("/");
     } catch {
-      alert("Login failed");
+      toast.error("Login failed");
     }
   }
 
