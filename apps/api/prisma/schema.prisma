@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -20,9 +18,10 @@ enum DocumentType {
 }
 
 enum DocumentStatus {
-  PENDING
+  DRAFT
   COMPLETED
   CANCELLED
+  RETURNED
 }
 
 enum StockMovementType {
@@ -40,6 +39,18 @@ enum UserRole {
   ACCOUNTANT
 }
 
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  CANCEL
+  IMPORT
+  SALE
+  PURCHASE
+}
+
 model User {
   id           String @id @default(cuid())
   name         String
@@ -47,6 +58,8 @@ model User {
   passwordHash String
 
   role UserRole @default(CASHIER)
+
+  auditLogs AuditLog[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -244,9 +257,37 @@ model Payment {
 
   method String
 
+  isRefunded Boolean @default(false)
+
   document Document @relation(fields: [documentId], references: [id])
 
   createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id String @id @default(cuid())
+
+  userId String?
+
+  action AuditAction
+
+  entityType String
+
+  entityId String?
+
+  oldData Json?
+
+  newData Json?
+
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([entityType])
+  @@index([createdAt])
 }
 
 model StockMovement {

@@ -5,24 +5,31 @@ import { prisma } from "../../config/prisma";
 import { InventoryService } from "../inventory/inventory.service";
 
 import { calculateGSTAmount } from "./documents.utils";
+
 import { calculateSellingPrice } from "../../utils/pricing";
 
+import { AuditService } from "../audit/audit.service";
+
 export class DocumentsService {
-  static async createDocument(data: {
-    type: DocumentType;
+  static async createDocument(
+    data: {
+      type: DocumentType;
 
-    customerId?: string;
+      customerId?: string;
 
-    items: {
-      variantId: string;
-      quantity: number;
-    }[];
+      items: {
+        variantId: string;
+        quantity: number;
+      }[];
 
-    payment?: {
-      amount: number;
-      method: string;
-    };
-  }) {
+      payment?: {
+        amount: number;
+        method: string;
+      };
+    },
+
+    userId?: string,
+  ) {
     return prisma.$transaction(async (tx) => {
       let subtotal = 0;
 
@@ -149,6 +156,23 @@ export class DocumentsService {
           },
         });
       }
+
+      // AUDIT LOG
+      await AuditService.log({
+        userId,
+
+        action: "SALE",
+
+        entityType: "DOCUMENT",
+
+        entityId: document.id,
+
+        newData: {
+          type: document.type,
+
+          total: document.grandTotal,
+        },
+      });
 
       return document;
     });

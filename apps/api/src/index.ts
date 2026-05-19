@@ -12,6 +12,7 @@ import productRoutes from "./modules/products/products.routes";
 import inventoryRoutes from "./modules/inventory/inventory.routes";
 import documentsRoutes from "./modules/documents/documents.routes";
 import analyticsRoutes from "./modules/analytics/analytics.routes";
+import auditRoutes from "./modules/audit/audit.routes";
 
 dotenv.config();
 
@@ -56,6 +57,8 @@ app.use("/api/inventory", inventoryRoutes);
 app.use("/api/documents", documentsRoutes);
 
 app.use("/api/analytics", analyticsRoutes);
+
+app.use("/api/audit", auditRoutes);
 
 const PORT = process.env.PORT || 4000;
 

@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 
 import { prisma } from "../../config/prisma";
 
+import { AuditService } from "../audit/audit.service";
+
 const JWT_SECRET = process.env.JWT_SECRET!;
 
 if (!JWT_SECRET) {
@@ -41,6 +43,15 @@ export class AuthService {
         expiresIn: process.env.JWT_EXPIRES_IN as jwt.SignOptions["expiresIn"],
       },
     );
+
+    // AUDIT LOGIN
+    await AuditService.log({
+      userId: user.id,
+
+      action: "LOGIN",
+
+      entityType: "AUTH",
+    });
 
     return {
       user,

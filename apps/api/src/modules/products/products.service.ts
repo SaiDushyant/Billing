@@ -154,6 +154,14 @@ export class ProductsService {
     }));
   }
 
+  static async getVariantById(id: string) {
+    return prisma.productVariant.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
+
   static async updateVariant(id: string, data: any) {
     return prisma.productVariant.update({
       where: {

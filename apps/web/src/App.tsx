@@ -6,6 +6,7 @@ import InventoryPage from "./pages/InventoryPage";
 import BarcodePage from "./pages/BarcodePage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import AuditPage from "./pages/AuditPage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -36,6 +37,8 @@ function Layout() {
         {["ADMIN", "INVENTORY_MANAGER"].includes(user?.role || "") && (
           <Link to="/inventory">Inventory</Link>
         )}
+
+        {user?.role === "ADMIN" && <Link to="/audit">Audit</Link>}
 
         <Link to="/barcode">Barcode</Link>
 
@@ -70,6 +73,8 @@ export default function App() {
         <Route path="/dashboard" element={<DashboardPage />} />
 
         <Route path="/inventory" element={<InventoryPage />} />
+
+        <Route path="/audit" element={<AuditPage />} />
 
         <Route path="/barcode" element={<BarcodePage />} />
       </Route>

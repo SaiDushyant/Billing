@@ -13,7 +13,11 @@ export class DocumentsController {
     try {
       const validated = createDocumentSchema.parse(req.body);
 
-      const document = await DocumentsService.createDocument(validated);
+      const document = await DocumentsService.createDocument(
+        validated,
+
+        req.user?.id,
+      );
 
       res.status(201).json(document);
     } catch (error: any) {

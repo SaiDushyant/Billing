@@ -16,6 +16,8 @@ import { parseImportFile } from "./import/import.utils";
 
 import { importRowSchema } from "./import/import.validation";
 
+import { createAuditLog } from "../../utils/audit.utils";
+
 export class ProductsController {
   static async createCategory(req: Request, res: Response) {
     try {
@@ -96,9 +98,28 @@ export class ProductsController {
 
   static async updateVariant(req: Request, res: Response) {
     try {
-      const validated = updateVariantSchema.parse(req.body);
+      const validatedData = updateVariantSchema.parse(req.body);
+
       const id = String(req.params.id);
-      const variant = await ProductsService.updateVariant(id, validated);
+
+      const oldVariant = await ProductsService.getVariantById(id);
+
+      const variant = await ProductsService.updateVariant(id, validatedData);
+
+      await createAuditLog({
+        req,
+
+        action: "UPDATE",
+
+        entityType: "PRODUCT_VARIANT",
+
+        entityId: variant.id,
+
+        oldData: oldVariant,
+
+        newData: variant,
+      });
+
       res.json(variant);
     } catch (error: any) {
       res.status(400).json({
@@ -128,17 +149,32 @@ export class ProductsController {
   static async importVariants(req: Request, res: Response) {
     try {
       if (!req.file) {
-        return res.status(400).json({
-          message: "File required",
-        });
+        throw new Error("File required");
       }
 
+      // FIXED HERE
       const rows = await parseImportFile(req.file.path);
 
-      const validatedRows = rows.map((row) => importRowSchema.parse(row));
+      const validatedRows = rows.map((row: any) => importRowSchema.parse(row));
 
       const results = await ProductsService.importVariants(validatedRows);
 
+      // AUDIT LOG
+      await createAuditLog({
+        req,
+
+        action: "IMPORT",
+
+        entityType: "PRODUCT_VARIANT",
+
+        metadata: {
+          importedRows: results.filter((r: any) => r.success).length,
+
+          failedRows: results.filter((r: any) => !r.success).length,
+        },
+      });
+
+      // DELETE TEMP FILE
       fs.unlinkSync(req.file.path);
 
       res.json(results);
