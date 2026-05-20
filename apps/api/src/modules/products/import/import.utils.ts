@@ -1,14 +1,15 @@
-import fs from "fs";
-
 import Papa from "papaparse";
 
-import XLSX from "xlsx";
+import * as XLSX from "xlsx";
 
-export async function parseImportFile(filePath: string) {
-  if (filePath.endsWith(".csv")) {
-    const file = fs.readFileSync(filePath, "utf-8");
+export async function parseImportFile(buffer: Buffer, fileName?: string) {
+  const lowerFileName = fileName?.toLowerCase() || "";
 
-    const parsed = Papa.parse(file, {
+  // CSV FILE
+  if (lowerFileName.endsWith(".csv")) {
+    const csvText = buffer.toString("utf-8");
+
+    const parsed = Papa.parse(csvText, {
       header: true,
 
       skipEmptyLines: true,
@@ -17,7 +18,10 @@ export async function parseImportFile(filePath: string) {
     return parsed.data;
   }
 
-  const workbook = XLSX.readFile(filePath);
+  // EXCEL FILE
+  const workbook = XLSX.read(buffer, {
+    type: "buffer",
+  });
 
   const sheetName = workbook.SheetNames[0];
 

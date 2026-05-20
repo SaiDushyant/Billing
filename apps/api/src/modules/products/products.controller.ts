@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
 
-import fs from "fs";
-
 import { ProductsService } from "./products.service";
 
 import {
@@ -152,14 +150,15 @@ export class ProductsController {
         throw new Error("File required");
       }
 
-      // FIXED HERE
-      const rows = await parseImportFile(req.file.path);
+      const rows = await parseImportFile(
+        req.file.buffer,
+        req.file.originalname,
+      );
 
       const validatedRows = rows.map((row: any) => importRowSchema.parse(row));
 
       const results = await ProductsService.importVariants(validatedRows);
 
-      // AUDIT LOG
       await createAuditLog({
         req,
 
@@ -173,9 +172,6 @@ export class ProductsController {
           failedRows: results.filter((r: any) => !r.success).length,
         },
       });
-
-      // DELETE TEMP FILE
-      fs.unlinkSync(req.file.path);
 
       res.json(results);
     } catch (error: any) {

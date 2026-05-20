@@ -48,6 +48,7 @@ router.get("/variants", ProductsController.getVariants);
 
 router.post(
   "/variants/import",
+  requireRole(["ADMIN", "INVENTORY_MANAGER"]),
   upload.single("file"),
   ProductsController.importVariants,
 );
