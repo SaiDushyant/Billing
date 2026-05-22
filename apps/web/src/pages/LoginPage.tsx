@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 import { api } from "@/lib/api";
 import { useAuthStore } from "@/store/auth.store";
@@ -24,6 +24,9 @@ export default function LoginPage() {
         email,
         password,
       });
+
+      console.log("LOGIN RESPONSE:", response.data);
+      console.log("TOKEN:", response.data.token);
 
       const { user, token } = response.data;
 

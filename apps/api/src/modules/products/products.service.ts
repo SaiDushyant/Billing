@@ -144,13 +144,26 @@ export class ProductsService {
     });
 
     return variants.map((variant) => ({
-      ...variant,
+      id: variant.id,
+
+      displayName: variant.displayName,
+
+      sku: variant.sku,
+
+      barcode: variant.barcode,
+
+      mrp: Number(variant.mrp),
+
+      gstRate: Number(variant.gstRate),
 
       sellingPrice: calculateSellingPrice(
         Number(variant.costPrice),
-
         Number(variant.profitMargin),
       ),
+
+      costPrice: Number(variant.costPrice),
+
+      profitMargin: Number(variant.profitMargin),
     }));
   }
 

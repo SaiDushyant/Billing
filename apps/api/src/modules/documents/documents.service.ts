@@ -17,6 +17,16 @@ export class DocumentsService {
 
       customerId?: string;
 
+      customerName?: string;
+
+      customerPhone?: string;
+
+      customerEmail?: string;
+
+      customerAddress?: string;
+
+      customerGSTNumber?: string;
+
       items: {
         variantId: string;
         quantity: number;
@@ -90,6 +100,16 @@ export class DocumentsService {
           status: "COMPLETED",
 
           customerId: data.customerId,
+
+          customerName: data.customerName,
+
+          customerPhone: data.customerPhone,
+
+          customerEmail: data.customerEmail,
+
+          customerAddress: data.customerAddress,
+
+          customerGSTNumber: data.customerGSTNumber,
 
           subtotal: new Prisma.Decimal(subtotal),
 

@@ -2,7 +2,15 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { prisma } from "../config/prisma";
 
-const JWT_SECRET = process.env.JWT_SECRET!;
+function getJwtSecret() {
+  const secret = process.env.JWT_SECRET;
+
+  if (!secret) {
+    throw new Error("JWT_SECRET missing");
+  }
+
+  return secret;
+}
 
 export async function authMiddleware(
   req: Request,
@@ -20,7 +28,7 @@ export async function authMiddleware(
 
     const token = authHeader.split(" ")[1];
 
-    const decoded = jwt.verify(token, JWT_SECRET) as {
+    const decoded = jwt.verify(token, getJwtSecret()) as {
       userId: string;
     };
 
@@ -39,7 +47,9 @@ export async function authMiddleware(
     req.user = user;
 
     next();
-  } catch {
+  } catch (error) {
+    console.log("AUTH ERROR:", error);
+
     return res.status(401).json({
       message: "Invalid token",
     });

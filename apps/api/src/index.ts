@@ -1,20 +1,22 @@
-import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
-import helmet from "helmet";
-import morgan from "morgan";
+dotenv.config();
+
+import express from "express";
+
 import compression from "compression";
 import rateLimit from "express-rate-limit";
+import helmet from "helmet";
+import morgan from "morgan";
 
-import authRoutes from "./modules/auth/auth.routes";
-import productRoutes from "./modules/products/products.routes";
-import inventoryRoutes from "./modules/inventory/inventory.routes";
-import documentsRoutes from "./modules/documents/documents.routes";
 import analyticsRoutes from "./modules/analytics/analytics.routes";
 import auditRoutes from "./modules/audit/audit.routes";
-
-dotenv.config();
+import authRoutes from "./modules/auth/auth.routes";
+import customersRoutes from "./modules/customers/customers.routes";
+import documentsRoutes from "./modules/documents/documents.routes";
+import inventoryRoutes from "./modules/inventory/inventory.routes";
+import productRoutes from "./modules/products/products.routes";
 
 const app = express();
 
@@ -49,6 +51,8 @@ app.get("/", (_, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+
+app.use("/api/customers", customersRoutes);
 
 app.use("/api/products", productRoutes);
 

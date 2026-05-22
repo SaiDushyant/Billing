@@ -192,13 +192,27 @@ model PurchaseItem {
 model Customer {
   id String @id @default(cuid())
 
-  name  String
-  phone String?
+  name String
+
+  phone String? @unique
+
+  email String?
+
+  address String?
+
+  gstNumber String?
 
   documents Document[]
 
   createdAt DateTime @default(now())
+
   updatedAt DateTime @updatedAt
+
+  @@index([name])
+
+  @@index([phone])
+
+  @@index([email])
 }
 
 model Document {
@@ -208,6 +222,16 @@ model Document {
   status DocumentStatus
 
   customerId String?
+
+  customerName String?
+
+  customerPhone String?
+
+  customerEmail String?
+
+  customerAddress String?
+
+  customerGSTNumber String?
 
   subtotal   Decimal @db.Decimal(12, 2)
   gstTotal   Decimal @db.Decimal(12, 2)

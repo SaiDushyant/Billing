@@ -67,4 +67,22 @@ export class AuthController {
       });
     }
   }
+
+  static async getUsers(
+    req: Request,
+
+    res: Response,
+  ) {
+    try {
+      const users = await AuthService.getAllUsers();
+
+      res.json(users);
+    } catch (error: unknown) {
+      res.status(400).json({
+        success: false,
+
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }
 }

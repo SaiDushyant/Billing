@@ -1,15 +1,17 @@
 import bcrypt from "bcrypt";
-
 import jwt from "jsonwebtoken";
 
 import { prisma } from "../../config/prisma";
-
 import { AuditService } from "../audit/audit.service";
 
-const JWT_SECRET = process.env.JWT_SECRET!;
+function getJwtSecret() {
+  const secret = process.env.JWT_SECRET;
 
-if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET missing");
+  if (!secret) {
+    throw new Error("JWT_SECRET missing");
+  }
+
+  return secret;
 }
 
 export class AuthService {
@@ -38,18 +40,15 @@ export class AuthService {
       {
         userId: user.id,
       },
-      JWT_SECRET,
+      getJwtSecret(),
       {
         expiresIn: process.env.JWT_EXPIRES_IN as jwt.SignOptions["expiresIn"],
       },
     );
 
-    // AUDIT LOGIN
     await AuditService.log({
       userId: user.id,
-
       action: "LOGIN",
-
       entityType: "AUTH",
     });
 
@@ -80,7 +79,7 @@ export class AuthService {
       {
         userId: user.id,
       },
-      JWT_SECRET,
+      getJwtSecret(),
       {
         expiresIn: process.env.JWT_EXPIRES_IN as jwt.SignOptions["expiresIn"],
       },
@@ -111,5 +110,23 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  static async getAllUsers() {
+    return prisma.user.findMany({
+      select: {
+        id: true,
+
+        name: true,
+
+        email: true,
+
+        role: true,
+      },
+
+      orderBy: {
+        name: "asc",
+      },
+    });
   }
 }
