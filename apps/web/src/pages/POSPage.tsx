@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { toast } from "sonner";
 
@@ -22,8 +22,6 @@ import type {
 import type { Customer } from "@/types/customer";
 
 import type { BillingUser } from "@/types/user";
-
-import { useProductSearch } from "@/features/pos/useProductSearch";
 
 import { api } from "@/lib/api";
 
@@ -79,32 +77,6 @@ export default function InvoicePage() {
   const [isSavingCustomer, setIsSavingCustomer] = useState(false);
 
   const [showPreview, setShowPreview] = useState(false);
-
-  const searchTerm = useMemo(() => {
-    return items.map((item) => item.search || "").join(" ");
-  }, [items]);
-
-  const { data: rawProducts = [] } = useProductSearch(searchTerm);
-
-  const products: ProductSearchResult[] = rawProducts.map((product) => ({
-    id: product.id,
-
-    displayName: product.displayName,
-
-    sku: product.sku,
-
-    barcode: product.barcode,
-
-    mrp: Number(product.mrp),
-
-    gstRate: Number(product.gstRate),
-
-    sellingPrice: Number(product.sellingPrice),
-
-    costPrice: Number(product.costPrice),
-
-    profitMargin: Number(product.profitMargin),
-  }));
 
   useEffect(() => {
     async function fetchUsers() {
@@ -436,7 +408,6 @@ export default function InvoicePage() {
 
           <InvoiceItemsTable
             items={items}
-            products={products}
             onUpdate={handleUpdateRow}
             onSelectProduct={handleSelectProduct}
             onRemove={handleRemoveRow}

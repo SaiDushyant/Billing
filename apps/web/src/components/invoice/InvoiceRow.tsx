@@ -4,14 +4,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { createPortal } from "react-dom";
 
+import { useProductSearch } from "@/features/pos/useProductSearch";
+
 import type { InvoiceItem, ProductSearchResult } from "@/types/invoice";
 
 import { formatCurrency } from "@/utils/invoice";
 
 interface Props {
   item: InvoiceItem;
-
-  products: ProductSearchResult[];
 
   onUpdate: (id: string, updates: Partial<InvoiceItem>) => void;
 
@@ -22,7 +22,6 @@ interface Props {
 
 export default function InvoiceRow({
   item,
-  products,
   onUpdate,
   onSelectProduct,
   onRemove,
@@ -54,15 +53,38 @@ export default function InvoiceRow({
     return () => clearTimeout(timeout);
   }, [item.search]);
 
+  // FETCH PRODUCTS
+  const { data: rawProducts = [] } = useProductSearch(debouncedSearch);
+
   // FILTER PRODUCTS
-  const filteredProducts = useMemo(() => {
+  const filteredProducts: ProductSearchResult[] = useMemo(() => {
     const search = debouncedSearch.toLowerCase();
 
+    const normalizedProducts = rawProducts.map((product) => ({
+      id: product.id,
+
+      displayName: product.displayName,
+
+      sku: product.sku,
+
+      barcode: product.barcode,
+
+      mrp: Number(product.mrp),
+
+      gstRate: Number(product.gstRate),
+
+      sellingPrice: Number(product.sellingPrice),
+
+      costPrice: Number(product.costPrice),
+
+      profitMargin: Number(product.profitMargin),
+    }));
+
     if (!search.trim()) {
-      return products.slice(0, 20);
+      return normalizedProducts.slice(0, 20);
     }
 
-    return products
+    return normalizedProducts
       .filter((product) => {
         return (
           product.displayName.toLowerCase().includes(search) ||
@@ -71,36 +93,34 @@ export default function InvoiceRow({
         );
       })
       .slice(0, 20);
-  }, [products, debouncedSearch]);
+  }, [rawProducts, debouncedSearch]);
 
-  // POSITION DROPDOWN
+  // FOLLOW INPUT POSITION
   useEffect(() => {
+    let frameId: number;
+
     function updatePosition() {
       if (item.showDropdown && inputRef.current) {
         const rect = inputRef.current.getBoundingClientRect();
 
         setDropdownPosition({
-          top: rect.bottom + window.scrollY + 8,
+          top: rect.bottom + window.scrollY + 4,
 
           left: rect.left + window.scrollX,
 
           width: rect.width,
         });
       }
+
+      frameId = requestAnimationFrame(updatePosition);
     }
 
     updatePosition();
 
-    window.addEventListener("scroll", updatePosition, true);
-
-    window.addEventListener("resize", updatePosition);
-
     return () => {
-      window.removeEventListener("scroll", updatePosition, true);
-
-      window.removeEventListener("resize", updatePosition);
+      cancelAnimationFrame(frameId);
     };
-  }, [item.showDropdown, item.search]);
+  }, [item.showDropdown]);
 
   // CLICK OUTSIDE
   useEffect(() => {
@@ -177,7 +197,7 @@ export default function InvoiceRow({
             ref={inputRef}
             value={item.search || ""}
             placeholder="Search product, SKU, barcode..."
-            className="w-full rounded-xl border bg-white p-2 outline-none ring-0 transition focus:ring-2 focus:ring-black"
+            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm shadow-sm outline-none transition-all focus:border-black focus:ring-4 focus:ring-slate-100"
             onFocus={() =>
               onUpdate(item.id, {
                 showDropdown: true,
@@ -198,7 +218,7 @@ export default function InvoiceRow({
           createPortal(
             <div
               ref={dropdownRef}
-              className="fixed z-99999 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+              className="absolute z-99999 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
               style={{
                 top: dropdownPosition.top,
 
@@ -306,7 +326,7 @@ export default function InvoiceRow({
         />
       </td>
 
-      {/* PROFIT MARGIN */}
+      {/* PROFIT */}
       <td className="w-32 p-3">
         <input
           type="number"
@@ -320,7 +340,7 @@ export default function InvoiceRow({
         />
       </td>
 
-      {/* Rate */}
+      {/* RATE */}
       <td className="w-37.5 p-3">
         <input
           type="number"
