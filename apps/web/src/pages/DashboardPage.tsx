@@ -10,6 +10,7 @@ import TopPlacesCard from "@/components/dashboard/TopPlacesCard";
 
 import RecentSalesTable from "@/components/dashboard/RecentSalesTable";
 
+import DashboardSkeleton from "@/components/dashboard/DashboardSkeleton";
 import { useDashboardAnalytics } from "@/features/analytics/useDashboardAnalytics";
 import { useState } from "react";
 
@@ -28,11 +29,11 @@ export default function DashboardPage() {
   });
 
   if (isLoading || !data) {
-    return <div className="p-6">Loading dashboard...</div>;
+    return <DashboardSkeleton />;
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 p-6">
+    <div className="min-h-screen bg-linear-to-br from-slate-100 via-slate-50 to-slate-200 p-6">
       {/* PAGE HEADER */}
       <div className="mb-6">
         <h1 className="text-4xl font-bold text-slate-900">Dashboard</h1>

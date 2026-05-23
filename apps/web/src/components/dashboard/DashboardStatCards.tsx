@@ -1,4 +1,12 @@
-import { DollarSign, Package, Receipt, ShoppingCart } from "lucide-react";
+import {
+  DollarSign,
+  Package,
+  Receipt,
+  ShoppingCart,
+  TrendingUp,
+} from "lucide-react";
+
+import DashboardCard from "./DashboardCard";
 
 interface Props {
   totalRevenue: number;
@@ -18,7 +26,7 @@ const cards = [
 
     icon: DollarSign,
 
-    bg: "bg-blue-500",
+    gradient: "from-blue-500 to-cyan-400",
   },
 
   {
@@ -28,7 +36,7 @@ const cards = [
 
     icon: Receipt,
 
-    bg: "bg-green-500",
+    gradient: "from-emerald-500 to-green-400",
   },
 
   {
@@ -38,7 +46,7 @@ const cards = [
 
     icon: ShoppingCart,
 
-    bg: "bg-purple-500",
+    gradient: "from-violet-500 to-purple-400",
   },
 
   {
@@ -48,7 +56,7 @@ const cards = [
 
     icon: Package,
 
-    bg: "bg-orange-500",
+    gradient: "from-orange-500 to-amber-400",
   },
 ];
 
@@ -77,30 +85,31 @@ export default function DashboardStatCards({
         const Icon = card.icon;
 
         return (
-          <div
-            key={card.key}
-            className="rounded-2xl border bg-white p-6 shadow-sm"
-          >
-            <div className="flex items-start gap-4">
-              <div
-                className={`flex h-14 w-14 items-center justify-center rounded-2xl text-white ${card.bg}`}
-              >
-                <Icon size={26} />
+          <DashboardCard key={card.key} className="overflow-hidden p-0">
+            <div
+              className={`bg-gradient-to-br ${card.gradient} p-6 text-white`}
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-white/80">{card.title}</p>
+
+                  <h2 className="mt-3 text-4xl font-bold tracking-tight">
+                    {values[card.key as keyof typeof values]}
+                  </h2>
+                </div>
+
+                <div className="rounded-2xl bg-white/20 p-3 backdrop-blur">
+                  <Icon size={28} />
+                </div>
               </div>
 
-              <div>
-                <p className="text-sm text-slate-500">{card.title}</p>
+              <div className="mt-6 flex items-center gap-2 text-sm">
+                <TrendingUp size={16} />
 
-                <h2 className="mt-2 text-3xl font-bold text-slate-900">
-                  {values[card.key as keyof typeof values]}
-                </h2>
-
-                <p className="mt-2 text-sm text-green-500">
-                  ▲ 12.4% vs last period
-                </p>
+                <span>+12.4% from last period</span>
               </div>
             </div>
-          </div>
+          </DashboardCard>
         );
       })}
     </div>

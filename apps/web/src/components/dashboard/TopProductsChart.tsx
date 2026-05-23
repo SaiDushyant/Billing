@@ -1,11 +1,14 @@
 import {
   Bar,
   BarChart,
+  CartesianGrid,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
+
+import DashboardCard from "./DashboardCard";
 
 interface Props {
   products: {
@@ -17,30 +20,34 @@ interface Props {
 
 export default function TopProductsChart({ products }: Props) {
   return (
-    <div className="rounded-2xl border bg-white p-6 shadow-sm">
+    <DashboardCard className="p-6">
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Products Sales</h2>
+        <div>
+          <h2 className="text-2xl font-semibold">Product Sales</h2>
 
-        <select className="rounded-lg border px-3 py-2 text-sm">
-          <option>Top 5</option>
+          <p className="mt-1 text-sm text-slate-500">Top performing products</p>
+        </div>
 
-          <option>Top 10</option>
-        </select>
+        <div className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-medium">
+          Live Analytics
+        </div>
       </div>
 
-      <div className="h-87.5">
+      <div className="h-95">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={products}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+
             <XAxis dataKey="name" />
 
             <YAxis />
 
             <Tooltip />
 
-            <Bar dataKey="quantity" radius={[8, 8, 0, 0]} />
+            <Bar dataKey="quantity" radius={[10, 10, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
-    </div>
+    </DashboardCard>
   );
 }
