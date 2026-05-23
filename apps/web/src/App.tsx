@@ -1,60 +1,29 @@
-import { Routes, Route, Link, Outlet, useNavigate } from "react-router-dom";
+import { Outlet, Route, Routes } from "react-router-dom";
 
-import POSPage from "./pages/POSPage";
-import DashboardPage from "./pages/DashboardPage";
-import InventoryPage from "./pages/InventoryPage";
-import BarcodePage from "./pages/BarcodePage";
-import LoginPage from "./pages/LoginPage";
-import SignupPage from "./pages/SignupPage";
 import AuditPage from "./pages/AuditPage";
+import BarcodePage from "./pages/BarcodePage";
+import DashboardPage from "./pages/DashboardPage";
 import DocumentsPage from "./pages/DocumentsPage";
+import InventoryPage from "./pages/InventoryPage";
+import LoginPage from "./pages/LoginPage";
+import POSPage from "./pages/POSPage";
+import SignupPage from "./pages/SignupPage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
-import { useAuthStore } from "./store/auth.store";
-
 import { Toaster } from "sonner";
+import AppSidebar from "./components/layout/AppSidebar";
 
 function Layout() {
-  const navigate = useNavigate();
-
-  const logout = useAuthStore((s) => s.logout);
-
-  const user = useAuthStore((s) => s.user);
-
-  function handleLogout() {
-    logout();
-
-    navigate("/login");
-  }
-
   return (
-    <div className="h-screen">
-      <div className="h-14 border-b bg-white flex items-center gap-4 px-4">
-        <Link to="/">POS</Link>
+    <div className="flex min-h-screen bg-slate-100">
+      {/* SIDEBAR */}
+      <AppSidebar />
 
-        {["ADMIN", "ACCOUNTANT"].includes(user?.role || "") && (
-          <Link to="/dashboard">Dashboard</Link>
-        )}
-
-        {["ADMIN", "INVENTORY_MANAGER"].includes(user?.role || "") && (
-          <Link to="/inventory">Inventory</Link>
-        )}
-
-        <Link to="/documents">Documents</Link>
-
-        {user?.role === "ADMIN" && <Link to="/audit">Audit</Link>}
-
-        <Link to="/barcode">Barcode</Link>
-
-        <div className="ml-auto flex items-center gap-4">
-          <span className="text-sm text-gray-500">{user?.name}</span>
-
-          <button onClick={handleLogout}>Logout</button>
-        </div>
-      </div>
-
-      <Outlet />
+      {/* PAGE CONTENT */}
+      <main className="flex-1 overflow-y-auto">
+        <Outlet />
+      </main>
     </div>
   );
 }

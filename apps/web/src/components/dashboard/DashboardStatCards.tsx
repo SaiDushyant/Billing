@@ -86,9 +86,7 @@ export default function DashboardStatCards({
 
         return (
           <DashboardCard key={card.key} className="overflow-hidden p-0">
-            <div
-              className={`bg-gradient-to-br ${card.gradient} p-6 text-white`}
-            >
+            <div className={`bg-linear-to-br ${card.gradient} p-6 text-white`}>
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-sm text-white/80">{card.title}</p>
