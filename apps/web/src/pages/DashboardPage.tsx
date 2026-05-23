@@ -1,78 +1,90 @@
-import { Card, CardContent } from "@/components/ui/card";
+import DashboardFilters from "@/components/dashboard/DashboardFilters";
 
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import DashboardStatCards from "@/components/dashboard/DashboardStatCards";
+
+import TopProductsChart from "@/components/dashboard/TopProductsChart";
+
+import TopCustomersCard from "@/components/dashboard/TopCustomersCard";
+
+import TopPlacesCard from "@/components/dashboard/TopPlacesCard";
+
+import RecentSalesTable from "@/components/dashboard/RecentSalesTable";
 
 import { useDashboardAnalytics } from "@/features/analytics/useDashboardAnalytics";
+import { useState } from "react";
 
 export default function DashboardPage() {
-  const { data, isLoading } = useDashboardAnalytics();
+  const [startDate, setStartDate] = useState("");
 
-  if (isLoading) {
-    return <div className="p-6">Loading...</div>;
+  const [endDate, setEndDate] = useState("");
+
+  const [topProductsCount, setTopProductsCount] = useState(5);
+  const { data, isLoading } = useDashboardAnalytics({
+    startDate,
+
+    endDate,
+
+    top: topProductsCount,
+  });
+
+  if (isLoading || !data) {
+    return <div className="p-6">Loading dashboard...</div>;
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold">ERP Dashboard</h1>
+    <div className="min-h-screen bg-slate-100 p-6">
+      {/* PAGE HEADER */}
+      <div className="mb-6">
+        <h1 className="text-4xl font-bold text-slate-900">Dashboard</h1>
 
-      {/* CARDS */}
-      <div className="grid grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="text-sm text-gray-500">Revenue</h3>
-
-            <p className="text-3xl font-bold mt-2">
-              ₹{data.totalRevenue.toFixed(2)}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="text-sm text-gray-500">GST Collected</h3>
-
-            <p className="text-3xl font-bold mt-2">
-              ₹{data.totalGST.toFixed(2)}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="text-sm text-gray-500">Sales</h3>
-
-            <p className="text-3xl font-bold mt-2">{data.totalSales}</p>
-          </CardContent>
-        </Card>
+        <p className="mt-2 text-slate-500">
+          Monitor sales, analytics, and business performance
+        </p>
       </div>
 
-      {/* TOP PRODUCTS */}
-      <Card>
-        <CardContent className="p-6">
-          <h2 className="font-bold text-xl mb-4">Top Products</h2>
+      {/* FILTERS */}
+      <div className="mb-6">
+        <DashboardFilters
+          startDate={startDate}
+          endDate={endDate}
+          topProductsCount={topProductsCount}
+          onStartDateChange={setStartDate}
+          onEndDateChange={setEndDate}
+          onTopProductsChange={setTopProductsCount}
+          onReset={() => {
+            setStartDate("");
 
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data.topProducts}>
-                <XAxis dataKey="name" />
+            setEndDate("");
 
-                <YAxis />
+            setTopProductsCount(5);
+          }}
+        />
+      </div>
 
-                <Tooltip />
+      {/* STATS */}
+      <div className="mb-6">
+        <DashboardStatCards
+          totalRevenue={data.totalRevenue}
+          totalGST={data.totalGST}
+          totalSales={data.totalSales}
+          totalProductsSold={data.totalProductsSold}
+        />
+      </div>
 
-                <Bar dataKey="quantity" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
+      {/* CHART + SIDEBARS */}
+      <div className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-[1.6fr_0.8fr_0.8fr]">
+        {/* CHART */}
+        <TopProductsChart products={data.topProducts} />
+
+        {/* CUSTOMERS */}
+        <TopCustomersCard customers={data.topCustomers} />
+
+        {/* PLACES */}
+        <TopPlacesCard places={data.topPlaces} />
+      </div>
+
+      {/* RECENT SALES */}
+      <RecentSalesTable sales={data.recentSales} />
     </div>
   );
 }

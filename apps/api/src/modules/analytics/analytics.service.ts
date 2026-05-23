@@ -1,26 +1,44 @@
 import { prisma } from "../../config/prisma";
 
 export class AnalyticsService {
-  static async getDashboardAnalytics() {
-    const documents = await prisma.document.findMany({
-      where: {
-        type: {
-          in: ["INVOICE", "BILL"],
-        },
+  static async getDashboardAnalytics(filters: {
+    startDate?: string;
 
-        status: "COMPLETED",
+    endDate?: string;
+
+    top?: number;
+  }) {
+    const whereClause: any = {
+      type: {
+        in: ["INVOICE", "BILL"],
       },
+
+      status: "COMPLETED",
+    };
+
+    if (filters.startDate && filters.endDate) {
+      whereClause.createdAt = {
+        gte: new Date(filters.startDate),
+
+        lte: new Date(filters.endDate),
+      };
+    }
+
+    const documents = await prisma.document.findMany({
+      where: whereClause,
 
       include: {
         items: {
           include: {
-            variant: {
-              include: {
-                product: true,
-              },
-            },
+            variant: true,
           },
         },
+
+        payments: true,
+      },
+
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
@@ -29,6 +47,8 @@ export class AnalyticsService {
     let totalGST = 0;
 
     let totalSales = documents.length;
+
+    let totalProductsSold = 0;
 
     const productSalesMap = new Map<
       string,
@@ -39,18 +59,39 @@ export class AnalyticsService {
       }
     >();
 
+    const customerMap = new Map<
+      string,
+      {
+        name: string;
+        orders: number;
+        amount: number;
+      }
+    >();
+
+    const placeMap = new Map<
+      string,
+      {
+        place: string;
+        orders: number;
+        amount: number;
+      }
+    >();
+
     for (const document of documents) {
       totalRevenue += Number(document.grandTotal);
 
       totalGST += Number(document.gstTotal);
 
       for (const item of document.items) {
-        const existing = productSalesMap.get(item.variantId);
+        totalProductsSold += item.quantity;
 
-        if (existing) {
-          existing.quantity += item.quantity;
+        // TOP PRODUCTS
+        const existingProduct = productSalesMap.get(item.variantId);
 
-          existing.revenue += Number(item.lineTotal);
+        if (existingProduct) {
+          existingProduct.quantity += item.quantity;
+
+          existingProduct.revenue += Number(item.lineTotal);
         } else {
           productSalesMap.set(item.variantId, {
             name: item.variant.displayName,
@@ -61,11 +102,79 @@ export class AnalyticsService {
           });
         }
       }
+
+      // TOP CUSTOMERS
+      const customerName = document.customerName || "Walk-in Customer";
+
+      const existingCustomer = customerMap.get(customerName);
+
+      if (existingCustomer) {
+        existingCustomer.orders += 1;
+
+        existingCustomer.amount += Number(document.grandTotal);
+      } else {
+        customerMap.set(customerName, {
+          name: customerName,
+
+          orders: 1,
+
+          amount: Number(document.grandTotal),
+        });
+      }
+
+      // TOP PLACES
+      const place = document.customerAddress || "Unknown";
+
+      const existingPlace = placeMap.get(place);
+
+      if (existingPlace) {
+        existingPlace.orders += 1;
+
+        existingPlace.amount += Number(document.grandTotal);
+      } else {
+        placeMap.set(place, {
+          place,
+
+          orders: 1,
+
+          amount: Number(document.grandTotal),
+        });
+      }
     }
 
     const topProducts = Array.from(productSalesMap.values())
       .sort((a, b) => b.quantity - a.quantity)
-      .slice(0, 5);
+      .slice(0, filters.top || 5);
+
+    const topCustomers = Array.from(customerMap.values())
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, 10);
+
+    const topPlaces = Array.from(placeMap.values())
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, 10);
+
+    const recentSales = documents.slice(0, 10).map((document) => ({
+      id: document.id,
+
+      date: document.createdAt.toISOString(),
+
+      customer: document.customerName || "Walk-in Customer",
+
+      place: document.customerAddress || "Unknown",
+
+      products: document.items
+        .map((item) => item.variant.displayName)
+        .join(", "),
+
+      totalItems: document.items.reduce((acc, item) => acc + item.quantity, 0),
+
+      totalAmount: Number(document.grandTotal),
+
+      paymentMode: document.payments[0]?.method || "N/A",
+
+      status: document.status,
+    }));
 
     return {
       totalRevenue,
@@ -74,7 +183,15 @@ export class AnalyticsService {
 
       totalSales,
 
+      totalProductsSold,
+
       topProducts,
+
+      topCustomers,
+
+      topPlaces,
+
+      recentSales,
     };
   }
 

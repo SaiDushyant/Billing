@@ -3,9 +3,17 @@ import { Request, Response } from "express";
 import { AnalyticsService } from "./analytics.service";
 
 export class AnalyticsController {
-  static async dashboard(_: Request, res: Response) {
+  static async dashboard(req: Request, res: Response) {
     try {
-      const analytics = await AnalyticsService.getDashboardAnalytics();
+      const { startDate, endDate, top } = req.query;
+
+      const analytics = await AnalyticsService.getDashboardAnalytics({
+        startDate: startDate as string,
+
+        endDate: endDate as string,
+
+        top: Number(top) || 5,
+      });
 
       res.json(analytics);
     } catch (error: any) {
