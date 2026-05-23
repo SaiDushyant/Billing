@@ -11,4 +11,10 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    allowedHosts: ["sparrowless-noncapricious-emmie.ngrok-free.dev"],
+    proxy: {
+      "/api":"https://sparrowless-noncapricious-emmie.ngrok-free.dev",
+    },
+  },
 })

@@ -1,6 +1,6 @@
 For your current stack, converting to Electron is honestly not that difficult.
 
-Because you already have:
+Because you already haveee:
 
 * React frontend
 * Express backend
