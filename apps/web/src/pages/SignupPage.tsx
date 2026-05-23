@@ -7,6 +7,7 @@ import { api } from "@/lib/api";
 import { useAuthStore } from "@/store/auth.store";
 
 import type { AuthResponse } from "@/types/auth";
+import { toast } from "sonner";
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ export default function SignupPage() {
 
     setIsLoading(true);
     try {
-      setLoading(true);
+      setIsLoading(true);
 
       const response = await api.post<AuthResponse>("/auth/register", {
         name,

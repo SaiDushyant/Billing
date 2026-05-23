@@ -8,6 +8,7 @@ import { api } from "@/lib/api";
 import { useAuthStore } from "@/store/auth.store";
 
 import type { AuthResponse } from "@/types/auth";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const navigate = useNavigate();
