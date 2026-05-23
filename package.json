@@ -1,4 +1,7 @@
 {
   "name": "billing",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "framer-motion": "^12.40.0"
+  }
 }
