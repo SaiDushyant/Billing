@@ -30,6 +30,7 @@ export interface InventoryVariant {
     name: string;
 
     brand: {
+      category: any;
       id: string;
 
       name: string;
@@ -42,9 +43,15 @@ export interface InventoryResponse {
 
   total: number;
 
-  page: number;
-
-  limit: number;
-
   totalPages: number;
+
+  stats: {
+    totalProducts: number;
+
+    lowStock: number;
+
+    outOfStock: number;
+
+    inventoryValue: number;
+  };
 }

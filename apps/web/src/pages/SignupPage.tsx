@@ -111,10 +111,10 @@ export default function SignupPage() {
         </div>
 
         {/* Elegant Mockup Background Curve */}
-        <div className="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-[0] opacity-40">
+        <div className="absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-0 opacity-40">
           <svg
             viewBox="0 0 1440 220"
-            className="relative block w-full h-[180px] text-blue-100"
+            className="relative block w-full h-45 text-blue-100"
             preserveAspectRatio="none"
           >
             <path
@@ -170,7 +170,7 @@ export default function SignupPage() {
           </div>
 
           {/* Underline Separator */}
-          <div className="w-14 h-[2px] bg-blue-200 rounded-full mb-4" />
+          <div className="w-14 h-0.5 bg-blue-200 rounded-full mb-4" />
 
           {/* Slogan */}
           <p className="text-slate-500 font-medium text-sm md:text-base tracking-wide max-w-sm mb-6">
@@ -523,7 +523,7 @@ export default function SignupPage() {
 
         {/* Right Column: The Signup Card */}
         <div className="md:col-span-6 flex justify-center md:justify-end px-2">
-          <div className="bg-white px-6 py-8 md:p-10 rounded-3xl w-full max-w-[460px] shadow-[0_15px_40px_rgba(59,130,246,0.06)] border border-slate-100 flex flex-col relative z-20">
+          <div className="bg-white px-6 py-8 md:p-10 rounded-3xl w-full max-w-115 shadow-[0_15px_40px_rgba(59,130,246,0.06)] border border-slate-100 flex flex-col relative z-20">
             {/* User Plus Icon Bubble */}
             <div className="w-16 h-16 rounded-full bg-[#EFF6FF] border border-[#DBEAFE] flex items-center justify-center mx-auto mb-6 text-blue-600 shadow-inner">
               <svg

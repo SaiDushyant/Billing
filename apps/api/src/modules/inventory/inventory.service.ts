@@ -215,18 +215,139 @@ export class InventoryService {
   // =========================
   // INVENTORY OVERVIEW
   // =========================
-  static async getInventoryOverview() {
+  static async getInventoryOverview({
+    page,
+    limit,
+    search,
+    category,
+    brand,
+    stockStatus,
+  }: {
+    page: number;
+
+    limit: number;
+
+    search?: string;
+
+    category?: string;
+
+    brand?: string;
+
+    stockStatus?: string;
+  }) {
+    const andConditions: Prisma.ProductVariantWhereInput[] = [];
+
+    const where: Prisma.ProductVariantWhereInput = {
+      AND: andConditions,
+    };
+
+    if (search) {
+      andConditions.push({
+        OR: [
+          {
+            displayName: {
+              contains: search,
+
+              mode: "insensitive",
+            },
+          },
+
+          {
+            sku: {
+              contains: search,
+
+              mode: "insensitive",
+            },
+          },
+
+          {
+            barcode: {
+              contains: search,
+
+              mode: "insensitive",
+            },
+          },
+        ],
+      });
+    }
+
+    if (category) {
+      andConditions.push({
+        product: {
+          brand: {
+            category: {
+              name: category,
+            },
+          },
+        },
+      });
+    }
+
+    if (brand) {
+      andConditions.push({
+        product: {
+          brand: {
+            name: brand,
+          },
+        },
+      });
+    }
+
+    if (stockStatus === "LOW_STOCK") {
+      andConditions.push({
+        currentStock: {
+          gt: 0,
+
+          lte: 5,
+        },
+      });
+    }
+
+    if (stockStatus === "OUT_OF_STOCK") {
+      andConditions.push({
+        currentStock: {
+          lte: 0,
+        },
+      });
+    }
+
+    if (stockStatus === "IN_STOCK") {
+      andConditions.push({
+        currentStock: {
+          gt: 5,
+        },
+      });
+    }
+
+    const total = await prisma.productVariant.count({
+      where,
+    });
+
     const variants = await prisma.productVariant.findMany({
+      where,
+
       include: {
         product: {
           include: {
-            brand: true,
+            brand: {
+              include: {
+                category: true,
+              },
+            },
           },
         },
       },
+
+      skip: (page - 1) * limit,
+
+      take: limit,
+
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
-    return variants.map((variant) => {
+    const items = variants.map((variant) => {
       const sellingPrice = calculateSellingPrice(
         Number(variant.costPrice),
         Number(variant.profitMargin),
@@ -241,21 +362,68 @@ export class InventoryService {
 
         barcode: variant.barcode,
 
-        costPrice: variant.costPrice,
+        costPrice: Number(variant.costPrice),
 
-        mrp: variant.mrp,
+        mrp: Number(variant.mrp),
 
-        profitMargin: variant.profitMargin,
+        profitMargin: Number(variant.profitMargin),
 
         sellingPrice,
+
+        gstRate: Number(variant.gstRate),
 
         currentStock: variant.currentStock,
 
         lowStock: variant.currentStock < 5,
 
+        inventoryValue: sellingPrice * variant.currentStock,
+
         product: variant.product,
       };
     });
+
+    const totalProducts = await prisma.productVariant.count();
+
+    const lowStock = await prisma.productVariant.count({
+      where: {
+        currentStock: {
+          gt: 0,
+
+          lte: 5,
+        },
+      },
+    });
+
+    const outOfStock = await prisma.productVariant.count({
+      where: {
+        currentStock: {
+          lte: 0,
+        },
+      },
+    });
+
+    const inventoryValue = items.reduce(
+      (sum, item) => sum + item.inventoryValue,
+      0,
+    );
+
+    return {
+      items,
+
+      total,
+
+      totalPages: Math.ceil(total / limit),
+
+      stats: {
+        totalProducts,
+
+        lowStock,
+
+        outOfStock,
+
+        inventoryValue,
+      },
+    };
   }
 
   // =========================
@@ -289,5 +457,37 @@ export class InventoryService {
 
       actualStock,
     };
+  }
+
+  static async getCategories() {
+    const categories = await prisma.category.findMany({
+      orderBy: {
+        name: "asc",
+      },
+
+      select: {
+        id: true,
+
+        name: true,
+      },
+    });
+
+    return categories;
+  }
+
+  static async getBrands() {
+    const brands = await prisma.brand.findMany({
+      orderBy: {
+        name: "asc",
+      },
+
+      select: {
+        id: true,
+
+        name: true,
+      },
+    });
+
+    return brands;
   }
 }

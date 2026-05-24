@@ -56,11 +56,54 @@ export class InventoryController {
     }
   }
 
-  static async getOverview(_: Request, res: Response) {
+  static async getOverview(req: Request, res: Response) {
     try {
-      const inventory = await InventoryService.getInventoryOverview();
+      const page = Number(req.query.page || 1);
+
+      const limit = Number(req.query.limit || 10);
+
+      const search = String(req.query.search || "");
+
+      const category = String(req.query.category || "");
+
+      const brand = String(req.query.brand || "");
+
+      const stockStatus = String(req.query.stockStatus || "");
+
+      const inventory = await InventoryService.getInventoryOverview({
+        page,
+        limit,
+        search,
+        category,
+        brand,
+        stockStatus,
+      });
 
       res.json(inventory);
+    } catch (error: any) {
+      res.status(400).json({
+        message: error.message,
+      });
+    }
+  }
+
+  static async getCategories(req: Request, res: Response) {
+    try {
+      const categories = await InventoryService.getCategories();
+
+      res.json(categories);
+    } catch (error: any) {
+      res.status(400).json({
+        message: error.message,
+      });
+    }
+  }
+
+  static async getBrands(req: Request, res: Response) {
+    try {
+      const brands = await InventoryService.getBrands();
+
+      res.json(brands);
     } catch (error: any) {
       res.status(400).json({
         message: error.message,

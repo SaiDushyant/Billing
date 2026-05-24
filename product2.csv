@@ -1,0 +1,16 @@
+categoryName,brandName,productName,displayName,sku,barcode,costPrice,mrp,profitMargin,gstRate,quantity
+Switch,Anchor,Roma Switch,Roma 6A 1 Way Switch,ANC-ROMA-6A-1W,8901234600001,45,65,44,18,120
+Switch,Anchor,Roma Switch,Roma 16A Switch,ANC-ROMA-16A,8901234600002,85,120,41,18,75
+Switch,Legrand,Myrius Switch,Myrius 6A Bell Push,LGR-MYR-6A-BP,8901234600003,95,140,47,18,60
+Socket,Havells,Crabtree Socket,Crabtree 6A Socket,HVL-CRB-6A-SKT,8901234600004,55,80,45,18,90
+Socket,Havells,Crabtree Socket,Crabtree 16A Socket,HVL-CRB-16A-SKT,8901234600005,110,155,41,18,50
+Wire,Polycab,House Wire,Polycab 1.5 Sqmm FR Wire Red,PLY-15SQ-RED,8901234600006,820,1050,28,18,35
+Wire,Polycab,House Wire,Polycab 2.5 Sqmm FR Wire Blue,PLY-25SQ-BLU,8901234600007,1320,1680,27,18,28
+Wire,Finolex,FR Wire,Finolex 1 Sqmm FR Wire Green,FIN-1SQ-GRN,8901234600008,640,820,28,18,40
+Fan,Crompton,Ceiling Fan,Crompton Aura 1200mm,CRO-AURA-1200,8901234600009,1850,2450,32,18,22
+Fan,Havells,Ceiling Fan,Havells Andria 1200mm,HVL-AND-1200,8901234600010,2100,2790,33,18,18
+LED Bulb,Philips,LED Bulb,Philips 9W LED Bulb Cool Day Light,PHL-9W-CDL,8901234600011,72,110,53,12,150
+LED Bulb,Wipro,LED Bulb,Wipro 12W LED Bulb Warm White,WIP-12W-WW,8901234600012,88,135,53,12,135
+Extension Board,GM,Power Strip,GM 4 Socket Extension Board,GM-4SKT-EXT,8901234600013,320,450,41,18,32
+Distribution Board,Legrand,DB Box,Legrand 8 Way SPN DB,LGR-8W-SPN,8901234600014,950,1280,35,18,14
+Contactor,Schneider,Contactor,Schneider 18A Contactor,SCH-CON-18A,8901234600015,1450,1920,32,18,10

@@ -12,7 +12,7 @@ import {
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useAuthStore } from "@/store/auth.store";
 
@@ -25,7 +25,17 @@ export default function AppSidebar() {
 
   const user = useAuthStore((s) => s.user);
 
-  const [collapsed, setCollapsed] = useState(false);
+  // PERSIST SIDEBAR STATE
+  const [collapsed, setCollapsed] = useState(() => {
+    const saved = localStorage.getItem("sidebar-collapsed");
+
+    return saved === "true";
+  });
+
+  // SAVE STATE
+  useEffect(() => {
+    localStorage.setItem("sidebar-collapsed", String(collapsed));
+  }, [collapsed]);
 
   function handleLogout() {
     logout();
@@ -97,34 +107,59 @@ export default function AppSidebar() {
 
   return (
     <aside
-      className={`sticky top-0 flex h-screen flex-col border-r bg-white transition-all duration-300 ${
+      className={`group sticky top-0 flex h-screen flex-col border-r border-slate-200 bg-white transition-all duration-300 ${
         collapsed ? "w-20" : "w-72"
       }`}
     >
       {/* TOP */}
-      <div className="flex h-20 items-center border-b px-5">
+      <div className="flex h-20  items-center border-b border-slate-200 px-4">
         <div className="flex items-center gap-3">
-          {/* LOGO */}
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-black text-lg font-bold text-white">
-            E
-          </div>
+          {/* LOGO / EXPAND */}
+          <button
+            onClick={() => collapsed && setCollapsed(false)}
+            className="group/logo relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-black text-white transition-all duration-300 hover:bg-slate-800"
+          >
+            {/* DEFAULT LOGO */}
+            <span
+              className={`absolute text-lg font-bold transition-all duration-200 ${
+                collapsed
+                  ? "opacity-100 group-hover/logo:opacity-0"
+                  : "opacity-100"
+              }`}
+            >
+              E
+            </span>
 
+            {/* EXPAND ICON */}
+            {collapsed && (
+              <ChevronRight
+                size={20}
+                className="absolute opacity-0 transition-all duration-200 group-hover/logo:opacity-100"
+              />
+            )}
+          </button>
+
+          {/* TITLE */}
           {!collapsed && (
-            <div>
-              <h1 className="text-xl font-bold">ERP System</h1>
+            <div className="min-w-0">
+              <h1 className="truncate text-xl font-bold text-slate-900">
+                ERP System
+              </h1>
 
               <p className="text-xs text-slate-500">Business Suite</p>
             </div>
           )}
         </div>
 
-        {/* COLLAPSE */}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="ml-auto rounded-xl p-2 hover:bg-slate-100"
-        >
-          {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-        </button>
+        {/* COLLAPSE BUTTON */}
+        {!collapsed && (
+          <button
+            onClick={() => setCollapsed(true)}
+            className="ml-auto rounded-xl p-2 transition hover:bg-slate-100"
+          >
+            <ChevronLeft size={18} />
+          </button>
+        )}
       </div>
 
       {/* NAVIGATION */}
@@ -141,7 +176,9 @@ export default function AppSidebar() {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center gap-4 rounded-2xl px-4 py-3 transition-all ${
+                  className={`group/item flex items-center rounded-2xl transition-all duration-200 ${
+                    collapsed ? "justify-center px-0 py-4" : "gap-4 px-4 py-3"
+                  } ${
                     active
                       ? "bg-black text-white shadow-lg"
                       : "text-slate-600 hover:bg-slate-100"
@@ -159,17 +196,19 @@ export default function AppSidebar() {
       </div>
 
       {/* USER */}
-      <div className="border-t p-4">
+      <div className="border-t border-slate-200 p-4">
         <div
           className={`flex items-center ${
             collapsed ? "justify-center" : "justify-between"
           }`}
         >
           {!collapsed && (
-            <div>
-              <p className="font-medium">{user?.name}</p>
+            <div className="min-w-0">
+              <p className="truncate font-medium text-slate-900">
+                {user?.name}
+              </p>
 
-              <p className="text-sm text-slate-500">{user?.role}</p>
+              <p className="truncate text-sm text-slate-500">{user?.role}</p>
             </div>
           )}
 

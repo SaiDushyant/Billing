@@ -16,4 +16,8 @@ router.get("/stock/:variantId", InventoryController.getCurrentStock);
 
 router.get("/overview", InventoryController.getOverview);
 
+router.get("/categories", InventoryController.getCategories);
+
+router.get("/brands", InventoryController.getBrands);
+
 export default router;

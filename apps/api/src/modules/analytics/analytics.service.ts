@@ -199,6 +199,16 @@ export class AnalyticsService {
     const variants = await prisma.productVariant.findMany({
       include: {
         stockMovements: true,
+
+        product: {
+          include: {
+            brand: {
+              include: {
+                category: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -223,21 +233,42 @@ export class AnalyticsService {
         }
       }
 
+      const inventoryValue = stock * Number(variant.costPrice);
+
       return {
         id: variant.id,
 
         displayName: variant.displayName,
 
         stock,
+
+        inventoryValue,
+
+        brand: variant.product.brand.name,
+
+        category: variant.product.brand.category.name,
       };
     });
 
-    const lowStock = inventory.filter((item) => item.stock < 5);
+    const lowStock = inventory.filter(
+      (item) => item.stock > 0 && item.stock < 5,
+    );
 
     const outOfStock = inventory.filter((item) => item.stock <= 0);
 
+    const totalInventoryValue = inventory.reduce(
+      (sum, item) => sum + item.inventoryValue,
+      0,
+    );
+
     return {
       totalProducts: inventory.length,
+
+      lowStockCount: lowStock.length,
+
+      outOfStockCount: outOfStock.length,
+
+      totalInventoryValue,
 
       lowStock,
 
