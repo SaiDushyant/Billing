@@ -10,6 +10,7 @@ import { CalendarDays, Clock3, Download, Filter, Search } from "lucide-react";
 
 import AuditDetailsDrawer from "@/components/audit/AuditDetailsDrawer";
 import { useAuditLogs } from "@/features/audit/useAuditLogs";
+import { exportAuditLogs } from "@/features/audit/useExportAuditLogs";
 import { generatePagination } from "@/utils/pagination";
 
 export default function AuditPage() {
@@ -83,28 +84,22 @@ export default function AuditPage() {
         </div>
         <div className="flex items-center gap-3">
           <button
-            onClick={() => {
-              const params = new URLSearchParams();
+            onClick={() =>
+              exportAuditLogs({
+                search,
 
-              if (search) {
-                params.append("search", search);
-              }
+                action,
 
-              if (action !== "ALL") {
-                params.append("action", action);
-              }
+                entityType,
 
-              if (entityType !== "ALL") {
-                params.append("entityType", entityType);
-              }
+                startDate,
 
-              window.open(
-                `${import.meta.env.VITE_API_URL}/audit/export?${params.toString()}`,
-                "_blank",
-              );
-            }}
+                endDate,
+              })
+            }
             className="flex h-11 items-center gap-2 rounded-xl border bg-white px-5 text-sm font-medium transition hover:bg-slate-50"
           >
+            <Download className="h-4 w-4" />
             Export CSV
           </button>
         </div>

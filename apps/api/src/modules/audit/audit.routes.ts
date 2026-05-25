@@ -12,6 +12,8 @@ router.use(authMiddleware);
 
 router.use(requireRole(["ADMIN"]));
 
+router.get("/export", AuditController.exportLogs);
+
 router.get("/", AuditController.getLogs);
 
 export default router;
