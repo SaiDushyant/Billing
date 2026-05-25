@@ -13,6 +13,10 @@ import {
   createEmptyInvoiceRow,
 } from "@/utils/invoice";
 
+import SplitPaymentPanel from "@/components/payments/SplitPaymentPanel";
+
+import type { PaymentInput } from "@/types/payment";
+
 import type {
   InvoiceDocumentType,
   InvoiceItem,
@@ -78,6 +82,16 @@ export default function InvoicePage() {
 
   const [showPreview, setShowPreview] = useState(false);
 
+  const [payments, setPayments] = useState<PaymentInput[]>([
+    {
+      id: crypto.randomUUID(),
+
+      method: "CASH",
+
+      amount: 0,
+    },
+  ]);
+
   useEffect(() => {
     async function fetchUsers() {
       try {
@@ -93,6 +107,18 @@ export default function InvoicePage() {
   }, []);
 
   const totals = calculateInvoiceTotals(items, shippingCharges);
+
+  useEffect(() => {
+    if (payments.length === 1) {
+      setPayments((prev) => [
+        {
+          ...prev[0],
+
+          amount: totals.grandTotal,
+        },
+      ]);
+    }
+  }, [totals.grandTotal]);
 
   function handleAddRow() {
     setItems((prev) => [...prev, createEmptyInvoiceRow()]);
@@ -253,6 +279,29 @@ export default function InvoicePage() {
         customerId = response.data.id;
       }
 
+      // =========================
+      // PAYMENT VALIDATION
+      // =========================
+
+      if (documentType === "INVOICE" || documentType === "BILL") {
+        const paidAmount = payments.reduce(
+          (sum, payment) => sum + payment.amount,
+          0,
+        );
+
+        if (paidAmount < totals.grandTotal) {
+          toast.error("Full payment is required");
+
+          return;
+        }
+
+        if (paidAmount > totals.grandTotal) {
+          toast.error("Payment exceeds invoice total");
+
+          return;
+        }
+      }
+
       const payload: {
         type: InvoiceDocumentType;
 
@@ -275,10 +324,15 @@ export default function InvoicePage() {
           quantity: number;
         }[];
 
-        payment?: {
+        payments?: {
           amount: number;
+
           method: string;
-        };
+
+          referenceNumber?: string;
+
+          notes?: string;
+        }[];
       } = {
         type: documentType,
 
@@ -302,14 +356,18 @@ export default function InvoicePage() {
           quantity: item.quantity,
         })),
 
-        payment:
+        payments:
           documentType === "INVOICE" || documentType === "BILL"
-            ? {
-                amount: totals.grandTotal,
+            ? payments.map((payment) => ({
+                amount: payment.amount,
 
-                method: "CASH",
-              }
-            : undefined,
+                method: payment.method,
+
+                referenceNumber: payment.referenceNumber,
+
+                notes: payment.notes,
+              }))
+            : [],
       };
 
       const response = await api.post("/documents", payload);
@@ -428,6 +486,12 @@ export default function InvoicePage() {
             discountTotal={discountTotal}
             onShippingChange={setShippingCharges}
             onDiscountChange={setDiscountTotal}
+          />
+
+          <SplitPaymentPanel
+            grandTotal={totals.grandTotal}
+            payments={payments}
+            onChange={setPayments}
           />
 
           <InvoiceActions
