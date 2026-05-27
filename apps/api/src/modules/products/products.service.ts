@@ -5,6 +5,19 @@ import { calculateSellingPrice } from "../../utils/pricing";
 
 export class ProductsService {
   static async createCategory(name: string) {
+    const existing = await prisma.category.findFirst({
+      where: {
+        name: {
+          equals: name,
+          mode: Prisma.QueryMode.insensitive,
+        },
+      },
+    });
+
+    if (existing) {
+      return existing;
+    }
+
     return prisma.category.create({
       data: {
         name,
@@ -13,6 +26,21 @@ export class ProductsService {
   }
 
   static async createBrand(name: string, categoryId: string) {
+    const existing = await prisma.brand.findFirst({
+      where: {
+        name: {
+          equals: name,
+          mode: Prisma.QueryMode.insensitive,
+        },
+
+        categoryId,
+      },
+    });
+
+    if (existing) {
+      return existing;
+    }
+
     return prisma.brand.create({
       data: {
         name,
@@ -27,6 +55,21 @@ export class ProductsService {
     brandId: string,
     description?: string,
   ) {
+    const existing = await prisma.product.findFirst({
+      where: {
+        name: {
+          equals: name,
+          mode: Prisma.QueryMode.insensitive,
+        },
+
+        brandId,
+      },
+    });
+
+    if (existing) {
+      return existing;
+    }
+
     return prisma.product.create({
       data: {
         name,
@@ -62,6 +105,23 @@ export class ProductsService {
     const openingStock = data.openingStock || 0;
 
     return prisma.$transaction(async (tx) => {
+      const existingVariant = await tx.productVariant.findFirst({
+        where: {
+          OR: [
+            {
+              sku: data.sku,
+            },
+
+            {
+              barcode: data.barcode,
+            },
+          ],
+        },
+      });
+
+      if (existingVariant) {
+        throw new Error("SKU or barcode already exists");
+      }
       const variant = await tx.productVariant.create({
         data: {
           productId: data.productId,

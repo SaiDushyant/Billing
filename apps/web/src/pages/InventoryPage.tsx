@@ -20,6 +20,7 @@ import { useInventoryFilters } from "@/features/inventory/useInventoryFilters";
 
 import { useInventory } from "@/features/inventory/useInventory";
 
+import AddProductDialog from "@/components/inventory/AddProductDialog";
 import type { InventoryVariant } from "@/types/inventory";
 
 export default function InventoryPage() {
@@ -37,6 +38,8 @@ export default function InventoryPage() {
 
   const [selectedVariant, setSelectedVariant] =
     useState<InventoryVariant | null>(null);
+
+  const [addOpen, setAddOpen] = useState(false);
 
   const { data, isLoading, isFetching } = useInventory({
     search,
@@ -72,7 +75,10 @@ export default function InventoryPage() {
           </div>
 
           {/* ADD PRODUCT */}
-          <Button className="h-12 rounded-2xl bg-linear-to-r from-blue-500 to-indigo-600 px-6 text-white shadow-lg hover:opacity-95">
+          <Button
+            onClick={() => setAddOpen(true)}
+            className="h-12 rounded-2xl bg-linear-to-r from-blue-500 to-indigo-600 px-6 text-white shadow-lg hover:opacity-95"
+          >
             <Plus className="mr-2 h-4 w-4" />
             Add Product
           </Button>
@@ -319,6 +325,7 @@ export default function InventoryPage() {
         onClose={() => setSelectedVariant(null)}
         variant={selectedVariant}
       />
+      <AddProductDialog open={addOpen} onClose={() => setAddOpen(false)} />
     </div>
   );
 }

@@ -127,7 +127,7 @@ export default function AppSidebar() {
                   : "opacity-100"
               }`}
             >
-              E
+              NK
             </span>
 
             {/* EXPAND ICON */}
@@ -143,10 +143,8 @@ export default function AppSidebar() {
           {!collapsed && (
             <div className="min-w-0">
               <h1 className="truncate text-xl font-bold text-slate-900">
-                ERP System
+                NK Poduval & CO
               </h1>
-
-              <p className="text-xs text-slate-500">Business Suite</p>
             </div>
           )}
         </div>
